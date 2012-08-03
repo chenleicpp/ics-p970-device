@@ -86,6 +86,7 @@ PRODUCT_COPY_FILES += \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libIMGegl.so:system/lib/libIMGegl.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libglslcompiler.so:system/lib/libglslcompiler.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libusc.so:system/lib/libusc.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libPVRScopeServices.so:system/lib/libPVRScopeServices.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/bin/pvrsrvinit:system/bin/pvrsrvinit
 
 # RIL

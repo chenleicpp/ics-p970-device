@@ -44,6 +44,7 @@ adb pull /system/lib/libpvrANDROID_WSEGL.so ../../../vendor/$VENDOR/$DEVICE/prop
 adb pull /system/lib/libIMGegl.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libglslcompiler.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libusc.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libPVRScopeServices.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/bin/pvrsrvinit ../../../vendor/$VENDOR/$DEVICE/proprietary/bin/
 
 # Radio
