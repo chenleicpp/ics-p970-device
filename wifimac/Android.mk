@@ -13,6 +13,8 @@
 # limitations under the License.
 
 
+ifneq ($(filter p970, $(TARGET_BOOTLOADER_BOARD_NAME)),)
+
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -25,3 +27,5 @@ LOCAL_PRELINK_MODULE := false
 LOCAL_MODULE := wifimac
 
 include $(BUILD_EXECUTABLE)
+
+endif

@@ -33,7 +33,15 @@ adb pull /system/lib/hw/gralloc.omap3.so ../../../vendor/$VENDOR/$DEVICE/proprie
 adb pull /system/lib/hw/lights.omap3.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
 adb pull /system/lib/hw/sensors.omap3.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
 
-## PVRSGX
+# Audio
+adb pull /system/lib/hw/alsa.p970.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
+adb pull /system/lib/hw/audio.primary.omap3.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
+adb pull /system/lib/liba2dp.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libasound.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libaudio.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libaudiomodemgeneric.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+
+# PVRSGX
 adb pull /system/lib/egl/libEGL_POWERVR_SGX530_125.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/egl
 adb pull /system/lib/egl/libGLESv1_CM_POWERVR_SGX530_125.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/egl
 adb pull /system/lib/egl/libGLESv2_POWERVR_SGX530_125.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/egl
@@ -44,16 +52,14 @@ adb pull /system/lib/libpvrANDROID_WSEGL.so ../../../vendor/$VENDOR/$DEVICE/prop
 adb pull /system/lib/libIMGegl.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libglslcompiler.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libusc.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-adb pull /system/lib/libPVRScopeServices.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/bin/pvrsrvinit ../../../vendor/$VENDOR/$DEVICE/proprietary/bin/
 
 # Radio
-
 adb pull /system/bin/rild ../../../vendor/$VENDOR/$DEVICE/proprietary/bin
 adb pull /system/lib/lge-ril.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib
 adb pull /system/lib/libril.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib
 adb pull /system/lib/libini.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib
-
+adb pull /system/lib/libreference-ril.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib
 
 # GPS
 adb pull /system/lib/hw/gps.omap3.so ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
@@ -125,20 +131,19 @@ adb pull /system/lib/dsp/yuvconvert.l64p ../../../vendor/$VENDOR/$DEVICE/proprie
 # BT firmware
 adb pull /system/etc/firmware/BCM43291A0_003.001.013.0066.xxxx_B-Project.hcd  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/firmware/
 
-## Camera and related blobs
-#adb pull /system/lib/libyuvfastconvert.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libicapture.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libicamera.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libcapl.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libcameraalgo.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libcamera.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libarcsoft_camera_func.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/lib/libImagePipeline.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
-#adb pull /system/etc/omapcam/imx072_dtp.dat  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
-#adb pull /system/etc/omapcam/imx072.rev  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
-#adb pull /system/etc/omapcam/fw3a.conf  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
-
-## OMX 720p libraries
+# Camera and related blobs
+adb pull /system/lib/libyuvfastconvert.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libicapture.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libicamera.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libcapl.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libcameraalgo.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libcamera.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libarcsoft_camera_func.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libImagePipeline.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/etc/omapcam/imx072_dtp.dat  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
+adb pull /system/etc/omapcam/imx072.rev  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
+adb pull /system/etc/omapcam/fw3a.conf  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
+# OMX 720p libraries
 adb pull /system/lib/libOMX.TI.mp4.splt.Encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.TI.720P.Encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.TI.720P.Decoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
