@@ -782,27 +782,6 @@ service rawip_vsnet1 /system/bin/init.vsnet 1
    disabled
    oneshot
 
-service rawip_vsnet1 /system/bin/init.vsnet 2
-   class main
-   user root
-   group radio cache inet misc
-   disabled
-   oneshot
-
-service rawip_vsnet1 /system/bin/init.vsnet 3
-   class main
-   user root
-   group radio cache inet misc
-   disabled
-   oneshot
-
-service rawip_vsnet1 /system/bin/init.vsnet 4
-   class main
-   user root
-   group radio cache inet misc
-   disabled
-   oneshot
-
 service wlan_precheck /system/bin/wlan-precheck
     class main
     oneshot
