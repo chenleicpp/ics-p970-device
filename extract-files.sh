@@ -24,6 +24,7 @@ mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/wifi
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/wifi/softap
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/cert
+mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omx
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/egl
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/hw
 mkdir -p ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/dsp
@@ -143,12 +144,37 @@ adb pull /system/lib/libImagePipeline.so  ../../../vendor/$VENDOR/$DEVICE/propri
 adb pull /system/etc/omapcam/imx072_dtp.dat  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
 adb pull /system/etc/omapcam/imx072.rev  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
 adb pull /system/etc/omapcam/fw3a.conf  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omapcam/
+
 # OMX 720p libraries
+adb pull /system/etc/policytable.tbl  ../../../vendor/$VENDOR/$DEVICE/proprietary/etc/omx/
 adb pull /system/lib/libOMX.TI.mp4.splt.Encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.TI.720P.Encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.TI.720P.Decoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.ITTIAM.AAC.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.ITTIAM.AAC.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 adb pull /system/lib/libOMX.TI.h264.splt.Encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.AAC.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.AAC.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.AMR.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.AMR.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G711.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G711.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G722.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G722.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G726.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G726.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G729.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.G729.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.ILBC.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.ILBC.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.JPEG.decoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.JPEG.encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.MP3.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.Video.Decoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.Video.encoder.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.VPP.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.WBAMR.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.WBAMR.encode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
+adb pull /system/lib/libOMX.TI.WMA.decode.so  ../../../vendor/$VENDOR/$DEVICE/proprietary/lib/
 
 ./setup-makefiles.sh

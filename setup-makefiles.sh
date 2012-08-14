@@ -200,14 +200,40 @@ PRODUCT_COPY_FILES += \\
     vendor/__VENDOR__/__DEVICE__/proprietary/etc/omapcam/imx072_dtp.dat:system/etc/omapcam/imx072_dtp.dat \\
     vendor/__VENDOR__/__DEVICE__/proprietary/etc/omapcam/imx072.rev:system/etc/omapcam/imx072.rev \\
     vendor/__VENDOR__/__DEVICE__/proprietary/etc/omapcam/fw3a.conf:system/etc/omapcam/fw3a.conf
+    
 # OMX 720p libraries
 PRODUCT_COPY_FILES += \\
+	vendor/__VENDOR__/__DEVICE__/proprietary/etc/omx/policytable.tbl:system/etc/policytable.tbl \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.mp4.splt.Encoder.so:system/lib/libOMX.TI.mp4.splt.Encoder.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.720P.Encoder.so:system/lib/libOMX.TI.720P.Encoder.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.720P.Decoder.so:system/lib/libOMX.TI.720P.Decoder.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.ITTIAM.AAC.encode.so:system/lib/libOMX.ITTIAM.AAC.encode.so \\
     vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.ITTIAM.AAC.decode.so:system/lib/libOMX.ITTIAM.AAC.decode.so \\
-    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.h264.splt.Encoder.so:system/lib/libOMX.TI.h264.splt.Encoder.so
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.h264.splt.Encoder.so:system/lib/libOMX.TI.h264.splt.Encoder.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.AAC.decode.so:system/lib/libOMX.TI.AAC.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.AAC.encode.so:system/lib/libOMX.TI.AAC.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.AMR.decode.so:system/lib/libOMX.TI.AMR.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.AMR.encode.so:system/lib/libOMX.TI.AMR.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G711.decode.so:system/lib/libOMX.TI.G711.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G711.encode.so:system/lib/libOMX.TI.G711.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G722.decode.so:system/lib/libOMX.TI.G722.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G722.encode.so:system/lib/libOMX.TI.G722.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G726.decode.so:system/lib/libOMX.TI.G726.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G726.encode.so:system/lib/libOMX.TI.G726.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G729.decode.so:system/lib/libOMX.TI.G729.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.G729.encode.so:system/lib/libOMX.TI.G729.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.ILBC.decode.so:system/lib/libOMX.TI.ILBC.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.ILBC.encode.so:system/lib/libOMX.TI.ILBC.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.JPEG.decoder.so:system/lib/libOMX.TI.JPEG.decoder.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.JPEG.encoder.so:system/lib/libOMX.TI.JPEG.encoder.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.MP3.decode.so:system/lib/libOMX.TI.MP3.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.Video.Decoder.so:system/lib/libOMX.TI.Video.Decoder.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.Video.encoder.so:system/lib/libOMX.TI.Video.encoder.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.VPP.so:system/lib/libOMX.TI.VPP.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.WBAMR.decode.so:system/lib/libOMX.TI.WBAMR.decode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.WBAMR.encode.so:system/lib/libOMX.TI.WBAMR.encode.so \\
+    vendor/__VENDOR__/__DEVICE__/proprietary/lib/libOMX.TI.WMA.decode.so:system/lib/libOMX.TI.WMA.decode.so
+    
 
 EOF
 
