@@ -92,9 +92,12 @@ PRODUCT_COPY_FILES += \
 ## GPS
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/gps_brcm_conf.xml:system/etc/gps_brcm_conf.xml
+    
+## Apn-conf
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/configs/apns-conf.xml:system/etc/apns-conf.xml
 
 ## Wifi
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifimac/wlan-precheck:system/bin/wlan-precheck \
     $(LOCAL_PATH)/prebuilt/wireless.ko:system/lib/modules/wireless.ko \
