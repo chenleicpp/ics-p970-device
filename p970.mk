@@ -163,6 +163,9 @@ PRODUCT_PACKAGES += \
     libOmxAmrEnc \
     libmm-omxcore \
     libOmxCore
+    
+# HWComposer
+PRODUCT_PACKAGES += hwcomposer.default
 
 # OpenMAX IL configuration
 PRODUCT_COPY_FILES += \
