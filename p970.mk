@@ -21,6 +21,8 @@ $(call inherit-product, device/common/gps/gps_us_supl.mk)
 PRODUCT_TAGS += dalvik.gc.type-precise
 $(call inherit-product, frameworks/base/build/phone-hdpi-512-dalvik-heap.mk)
 
+PRODUCT_LOCALES += hdpi
+
 DEVICE_PACKAGE_OVERLAYS += device/lge/p970/overlay
 
 
