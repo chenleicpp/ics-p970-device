@@ -1311,6 +1311,7 @@ int V4L2Camera::SetCameraFlip(bool isCapture)
 {
                 struct v4l2_control vc;
                 vc.id = V4L2_CID_FLIP;
+                LOGE("======QIWU====isCapture= %d",isCapture);
 		if(isCapture)
                 	vc.value = CAMERA_FLIP_NONE;
 		else

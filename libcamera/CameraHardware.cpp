@@ -556,7 +556,7 @@ status_t CameraHardware::startPreview()
         LOGE("Preview size is not valid,aborting..Device can not open!!!");
         return INVALID_OPERATION;
     }
-	
+	LOGE("=====QIWU=====CAMERA_FF=%d!",CAMERA_FF);
 	if(mCameraID==CAMERA_FF)	
 		fps=15;
 	ret = mCamera->Configure(mPreviewWidth,mPreviewHeight,PIXEL_FORMAT,fps,0);
