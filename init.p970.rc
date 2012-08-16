@@ -261,6 +261,9 @@ on post-fs
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.supplicant_scan_interval 20
     setprop wifi.interface wlan0
+    
+    setprop  ro.cm.device p970      
+    setprop ro.modversion CyanogenMod
 
 on boot
 # basic network init

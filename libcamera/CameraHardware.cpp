@@ -556,7 +556,8 @@ status_t CameraHardware::startPreview()
         LOGE("Preview size is not valid,aborting..Device can not open!!!");
         return INVALID_OPERATION;
     }
-	LOGE("=====QIWU=====CAMERA_FF=%d!",CAMERA_FF);
+	LOGE("\n\n\n=====QIWU=====CAMERA_FF=%d!",CAMERA_FF);
+	LOGE("\n\n\n=====QIWU=====mCameraID=%d!",mCameraID);
 	if(mCameraID==CAMERA_FF)	
 		fps=15;
 	ret = mCamera->Configure(mPreviewWidth,mPreviewHeight,PIXEL_FORMAT,fps,0);
@@ -565,7 +566,7 @@ status_t CameraHardware::startPreview()
 	    	return INVALID_OPERATION;
     }
    //dhiru1602 : Set FFC Flip
-   if(mCameraID==CAMERA_FF)
+  if(mCameraID==CAMERA_FF)
    	mCamera->SetCameraFlip(false);
    /* clear previously buffers*/
     if(mPreviewHeap != NULL) {
