@@ -35,7 +35,7 @@
 #define MEDIA_DEVICE        "/dev/media0"
 #define PREVIEW_WIDTH       640
 #define PREVIEW_HEIGHT      480
-#define PIXEL_FORMAT       V4L2_PIX_FMT_YUYV
+#define PIXEL_FORMAT       V4L2_PIX_FMT_UYVY
 //Define Cameras
 #define CAMERA_BF 0 //Back Camera
 #define CAMERA_FF 1
