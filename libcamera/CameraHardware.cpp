@@ -30,8 +30,8 @@
 #include <gui/ISurfaceTexture.h>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-#define VIDEO_DEVICE_2      "/dev/video5"
-#define VIDEO_DEVICE_0      "/dev/video0"
+#define VIDEO_DEVICE_2      "/dev/video0"
+#define VIDEO_DEVICE_0      "/dev/video5"
 #define MEDIA_DEVICE        "/dev/media0"
 #define PREVIEW_WIDTH       640
 #define PREVIEW_HEIGHT      480
@@ -556,8 +556,6 @@ status_t CameraHardware::startPreview()
         LOGE("Preview size is not valid,aborting..Device can not open!!!");
         return INVALID_OPERATION;
     }
-	LOGE("\n\n\n=====QIWU=====CAMERA_FF=%d!",CAMERA_FF);
-	LOGE("\n\n\n=====QIWU=====mCameraID=%d!",mCameraID);
 	if(mCameraID==CAMERA_FF)	
 		fps=15;
 	ret = mCamera->Configure(mPreviewWidth,mPreviewHeight,PIXEL_FORMAT,fps,0);

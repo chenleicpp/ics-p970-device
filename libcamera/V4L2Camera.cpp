@@ -1311,13 +1311,11 @@ int V4L2Camera::SetCameraFlip(bool isCapture)
 {
                 struct v4l2_control vc;
                 vc.id = V4L2_CID_FLIP;
-                LOGE("\n\n\n======QIWU====isCapture= %d",isCapture);
 		if(isCapture)
                 	vc.value = CAMERA_FLIP_NONE;
 		else
                 	vc.value = CAMERA_FLIP_MIRROR;
                 
-           LOGE("\n\n\n======QIWU====vc= %p",&vc);
                 
                 if (ioctl (camHandle, VIDIOC_S_CTRL, &vc) < 0) {
                     LOGE("V4L2_CID_FLIP fail!\n");

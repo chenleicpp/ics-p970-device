@@ -402,15 +402,16 @@ int camera_get_camera_info(int camera_id, struct camera_info *info)
     int rv = 0;
     int face_value = CAMERA_FACING_FRONT;
     const char *valstr = NULL;
-    if(camera_id == 1) { //p970  id = 0 is front
+    //0 is back
+    if(camera_id == 0) {
     info->facing = CAMERA_FACING_BACK;
-    info->orientation = 90;  // set 90
+    info->orientation = 90;
     LOGD("cameraHal BACK %d",camera_id);
     }
     else {
     LOGD("cameraHal Front %d",camera_id);
     info->facing = face_value;
-    info->orientation = 90;  //set 90
+    info->orientation = 90;
     }
     LOGD("cameraHal %d",camera_id);
     return rv;
