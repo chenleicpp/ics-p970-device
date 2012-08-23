@@ -3,162 +3,127 @@
 
 #define ANDROID_EXIF_H
 
-
-
 #define MAKER_NAME_LENGTH			20
 
 #define MODEL_NAME_LENGTH			20
 
-#define SOFTWARE_VERSION_LENGTH			5 
+#define SOFTWARE_VERSION_LENGTH			5
 
 #define DATE_TIME_FIELD_LENGTH			50
 
-
-
-typedef struct 
-
+typedef struct
 {
 
 	unsigned int numerator;
 
 	unsigned int denominator;
 
-}Rational;
+} Rational;
 
-
-
-typedef struct 
-
+typedef struct
 {
 
 	int numerator;
 
 	int denominator;
 
-}SRational;
-
-
+} SRational;
 
 typedef struct
-
 {
 
 	bool hasGps;
 
 	bool hasThumbnail;
 
-	
+	unsigned char maker[MAKER_NAME_LENGTH];
 
-	unsigned char 		maker[MAKER_NAME_LENGTH];
+	unsigned char model[MODEL_NAME_LENGTH];
 
-	unsigned char		model[MODEL_NAME_LENGTH];
+	unsigned char software[SOFTWARE_VERSION_LENGTH];
 
-	unsigned char 		software[SOFTWARE_VERSION_LENGTH];
+	unsigned int imageWidth;
 
+	unsigned int imageHeight;
 
+	unsigned int pixelXDimension;
 
-	unsigned int		imageWidth;
+	unsigned int pixelYDimension;
 
-	unsigned int		imageHeight;
+	unsigned char dateTimeOriginal[DATE_TIME_FIELD_LENGTH];
 
-	
+	unsigned char dateTimeDigitized[DATE_TIME_FIELD_LENGTH];
 
-	unsigned int			pixelXDimension;		
+	unsigned char dateTime[DATE_TIME_FIELD_LENGTH];
 
-	unsigned int			pixelYDimension;
+	unsigned int thumbImageWidth;
 
+	unsigned int thumbImageHeight;
 
+	unsigned char *thumbStream;
 
-	unsigned char			dateTimeOriginal[DATE_TIME_FIELD_LENGTH];
+	unsigned int thumbSize;
 
-	unsigned char			dateTimeDigitized[DATE_TIME_FIELD_LENGTH];
+	unsigned short exposureProgram;
 
-	unsigned char			dateTime[DATE_TIME_FIELD_LENGTH];
+	unsigned short meteringMode;
 
+	unsigned short exposureMode;
 
+	unsigned short whiteBalance;
 
-	unsigned int			thumbImageWidth;
+	unsigned short saturation;
 
-	unsigned int			thumbImageHeight;	
+	unsigned short sharpness;
 
-	unsigned char 			*thumbStream;    
+	unsigned short contrast;
 
-	unsigned int 			thumbSize;    
+	Rational fNumber;
 
-	
+	Rational maxAperture;
 
-	unsigned short			exposureProgram;
+	Rational focalLength;
 
-	unsigned short			meteringMode;	
+	unsigned short isoSpeedRating;
 
-	unsigned short			exposureMode;
+	Rational exposureTime;
 
-	unsigned short			whiteBalance;
+	SRational brightness;
 
-	unsigned short			saturation;
+	SRational shutterSpeed;
 
-	unsigned short			sharpness;
+	unsigned short iso;
 
-	unsigned short			contrast;
+	unsigned short flash;
 
-	Rational			fNumber;
+	int orientation;
 
-	Rational			maxAperture;
+	Rational aperture;
 
-	Rational			focalLength;
+	SRational exposureBias;
 
-	unsigned short			isoSpeedRating;	
+	unsigned short sceneCaptureType;
 
+	unsigned char Camversion[4];
 
+	unsigned char GPSLatitudeRef[2];
 
-	Rational			exposureTime;	
+	Rational GPSLatitude[3];
 
-	SRational			brightness;
+	unsigned char GPSLongitudeRef[2];
 
-	SRational			shutterSpeed;
+	Rational GPSLongitude[3];
 
+	unsigned char GPSAltitudeRef;
 
+	Rational GPSAltitude[1];
 
-	unsigned short			iso;	
+	Rational GPSTimestamp[3];
 
-	unsigned short			flash;	
+	unsigned char GPSProcessingMethod[150];
 
+	unsigned char GPSDatestamp[11];
 
-
-	int 				orientation;
-
-	Rational			aperture;
-
-	SRational			exposureBias;
-
-	unsigned short			sceneCaptureType;
-
-	unsigned char 		Camversion[4];
-
-	
-
-		    
-
-	unsigned char		GPSLatitudeRef[2];
-
-	Rational			GPSLatitude[3];	
-
-	unsigned char		GPSLongitudeRef[2];
-
-	Rational			GPSLongitude[3];	
-
-	unsigned char		GPSAltitudeRef;
-
-	Rational			GPSAltitude[1];    
-
-	Rational			GPSTimestamp[3];
-
-	unsigned char		GPSProcessingMethod[150];
-
-	unsigned char		GPSDatestamp[11];
-
-}ExifInfoStructure;
+} ExifInfoStructure;
 
 #endif
-
-

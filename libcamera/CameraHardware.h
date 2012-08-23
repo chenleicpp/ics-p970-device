@@ -53,218 +53,236 @@
 
 namespace android {
 
-typedef struct {
-    size_t width;
-    size_t height;
-} supported_resolution;
+	typedef struct {
+		size_t width;
+		size_t height;
+	} supported_resolution;
 
-class CameraHardware {
-public:
-    virtual sp<IMemoryHeap> getPreviewHeap() const;
-    virtual sp<IMemoryHeap> getRawHeap() const;
+	class CameraHardware {
+	      public:
+		virtual sp < IMemoryHeap > getPreviewHeap() const;
+		virtual sp < IMemoryHeap > getRawHeap() const;
 
-    virtual void setCallbacks(camera_notify_callback notify_cb,
-                              camera_data_callback data_cb,
-                              camera_data_timestamp_callback data_cb_timestamp,
-                              camera_request_memory get_memory,
-                              void* user);
-    virtual void        enableMsgType(int32_t msgType);
-    virtual void        disableMsgType(int32_t msgType);
-    virtual bool        msgTypeEnabled(int32_t msgType);
+		virtual void setCallbacks(camera_notify_callback notify_cb,
+					  camera_data_callback data_cb,
+					  camera_data_timestamp_callback
+					  data_cb_timestamp,
+					  camera_request_memory get_memory,
+					  void *user);
+		virtual void enableMsgType(int32_t msgType);
+		virtual void disableMsgType(int32_t msgType);
+		virtual bool msgTypeEnabled(int32_t msgType);
 
-    virtual int setPreviewWindow( struct preview_stream_ops *window);
+		virtual int setPreviewWindow(struct preview_stream_ops *window);
 
-    virtual status_t    startPreview();
-    virtual void        stopPreview();
-    virtual bool        previewEnabled();
+		virtual status_t startPreview();
+		virtual void stopPreview();
+		virtual bool previewEnabled();
 
-    virtual status_t    startRecording();
-    virtual void        stopRecording();
-    virtual bool        recordingEnabled();
-    virtual void        releaseRecordingFrame(const void* opaque);
+		virtual status_t startRecording();
+		virtual void stopRecording();
+		virtual bool recordingEnabled();
+		virtual void releaseRecordingFrame(const void *opaque);
 
-    virtual status_t    autoFocus();
-    virtual status_t    cancelAutoFocus();
-    virtual status_t    takePicture();
-    virtual status_t    cancelPicture();
-    virtual status_t    dump(int fd, const Vector<String16>& args) const;
-    virtual status_t    setParameters(const CameraParameters& params);
-    virtual CameraParameters  getParameters() const;
-    virtual status_t sendCommand(int32_t cmd, int32_t arg1, int32_t arg2);
-    virtual void release();
+		virtual status_t autoFocus();
+		virtual status_t cancelAutoFocus();
+		virtual status_t takePicture();
+		virtual status_t cancelPicture();
+		virtual status_t dump(int fd,
+				      const Vector < String16 > &args) const;
+		virtual status_t setParameters(const CameraParameters & params);
+		virtual CameraParameters getParameters() const;
+		virtual status_t sendCommand(int32_t cmd, int32_t arg1,
+					     int32_t arg2);
+		virtual void release();
 
-                        CameraHardware(int CameraID);
-    virtual             ~CameraHardware();
+		 CameraHardware(int CameraID);
+		 virtual ~ CameraHardware();
 
-    //static wp<CameraHardwareInterface> singleton;
+		//static wp<CameraHardwareInterface> singleton;
 
-private:
+	      private:
 
-    static const int kBufferCount = 6;
+		static const int kBufferCount = 6;
 
-    class PreviewThread : public Thread {
-        CameraHardware* mHardware;
-    public:
-        PreviewThread(CameraHardware* hw):
-            //: Thread(false), mHardware(hw) { }
+		class PreviewThread:public Thread {
+			CameraHardware *mHardware;
+		      public:
+			 PreviewThread(CameraHardware * hw):
+			    //: Thread(false), mHardware(hw) { }
 #ifdef SINGLE_PROCESS
-            // In single process mode this thread needs to be a java thread,
-            // since we won't be calling through the binder.
-            Thread(true),
+			    // In single process mode this thread needs to be a java thread,
+			    // since we won't be calling through the binder.
+			 Thread(true),
 #else
-			// We use Andorid thread
-            Thread(false),
+			    // We use Andorid thread
+			 Thread(false),
 #endif
-              mHardware(hw) { }
-        virtual void onFirstRef() {
-            run("CameraPreviewThread", PRIORITY_URGENT_DISPLAY);
-        }
-        virtual bool threadLoop() {
-            mHardware->previewThread();
-            // loop until we need to quit
-            return true;
-        }
-    };
+			 mHardware(hw) {
+			} virtual void onFirstRef() {
+				run("CameraPreviewThread",
+				    PRIORITY_URGENT_DISPLAY);
+			} virtual bool threadLoop() {
+				mHardware->previewThread();
+				// loop until we need to quit
+				return true;
+		}};
 
-    class AutoFocusThread : public Thread {
-        CameraHardware *mHardware;
-    public:
-        AutoFocusThread(CameraHardware *hw): Thread(false), mHardware(hw) { }
-        virtual void onFirstRef() {
-            run("CameraAutoFocusThread", PRIORITY_DEFAULT);
-        }
-        virtual bool threadLoop() {
-            mHardware->autoFocusThread();
-            return true;
-        }
-    };
+		class AutoFocusThread:public Thread {
+			CameraHardware *mHardware;
+		      public:
+			 AutoFocusThread(CameraHardware * hw):Thread(false),
+			    mHardware(hw) {
+			} virtual void onFirstRef() {
+				run("CameraAutoFocusThread", PRIORITY_DEFAULT);
+			}
+			virtual bool threadLoop() {
+				mHardware->autoFocusThread();
+				return true;
+			}
+		};
 
-    class PictureThread : public Thread {
-        CameraHardware *mHardware;
-    public:
-        PictureThread(CameraHardware *hw):
-        Thread(false),
-        mHardware(hw) { }
-        virtual bool threadLoop() {
-            mHardware->pictureThread();
-            return false;
-        }
-    };
+		class PictureThread:public Thread {
+			CameraHardware *mHardware;
+		      public:
+			 PictureThread(CameraHardware * hw):Thread(false),
+			    mHardware(hw) {
+			} virtual bool threadLoop() {
+				mHardware->pictureThread();
+				return false;
+			}
+		};
 
-    void initDefaultParameters(int CameraID);
-	int get_kernel_version();
-	void CreateExif(unsigned char* pInThumbnailData,int Inthumbsize,unsigned char* pOutExifBuf,int& OutExifSize,int flag);
-	void convertFromDecimalToGPSFormat(double arg1,int& arg2,int& arg3,double& arg4);
-	int convertToExifLMH(int value, int key);
-	double getGPSLatitude() const;
-	double getGPSLongitude() const;
-	double getGPSAltitude() const;
-	void setSkipFrame(int frame);
+		void initDefaultParameters(int CameraID);
+		int get_kernel_version();
+		void CreateExif(unsigned char *pInThumbnailData,
+				int Inthumbsize, unsigned char *pOutExifBuf,
+				int &OutExifSize, int flag);
+		void convertFromDecimalToGPSFormat(double arg1, int &arg2,
+						   int &arg3, double &arg4);
+		int convertToExifLMH(int value, int key);
+		double getGPSLatitude() const;
+		double getGPSLongitude() const;
+		double getGPSAltitude() const;
+		void setSkipFrame(int frame);
 
-    int previewThread();
-	/* validating supported size */
-	bool validateSize(size_t width, size_t height,
-			const supported_resolution *supRes, size_t count);
+		int previewThread();
+		/* validating supported size */
+		bool validateSize(size_t width, size_t height,
+				  const supported_resolution * supRes,
+				  size_t count);
 
-    static int beginAutoFocusThread(void *cookie);
+		static int beginAutoFocusThread(void *cookie);
 
-    static int beginPictureThread(void *cookie);
+		static int beginPictureThread(void *cookie);
 
-    camera_request_memory   mRequestMemory;
-    preview_stream_ops_t*  mNativeWindow;
-    camera_memory_t     *mRecordHeap[kBufferCount];
+		camera_request_memory mRequestMemory;
+		preview_stream_ops_t *mNativeWindow;
+		camera_memory_t *mRecordHeap[kBufferCount];
 
-    mutable Mutex       mLock;           // member property lock
-    mutable Mutex       mPreviewLock;    // hareware v4l2 operation lock
-    Mutex               mRecordingLock;
-    CameraParameters    mParameters;
+		mutable Mutex mLock;	// member property lock
+		mutable Mutex mPreviewLock;	// hareware v4l2 operation lock
+		Mutex mRecordingLock;
+		CameraParameters mParameters;
 
-    sp<MemoryHeapBase>  mHeap;         // format: 420
-    sp<MemoryBase>      mBuffer;
-    sp<MemoryHeapBase>  mPreviewHeap;
-    sp<MemoryBase>      mPreviewBuffer;
-	sp<MemoryHeapBase>  mRawHeap;      /* format: 422 */
-	sp<MemoryBase>      mRawBuffer;
-    sp<MemoryBase>      mBuffers[kBufferCount];
-    int mRecordBufferState[kBufferCount];
+		sp < MemoryHeapBase > mHeap;	// format: 420
+		sp < MemoryBase > mBuffer;
+		sp < MemoryHeapBase > mPreviewHeap;
+		sp < MemoryBase > mPreviewBuffer;
+		sp < MemoryHeapBase > mRawHeap;	/* format: 422 */
+		sp < MemoryBase > mRawBuffer;
+		sp < MemoryBase > mBuffers[kBufferCount];
+		int mRecordBufferState[kBufferCount];
 
-    mutable Mutex mSkipFrameLock;
-            int mSkipFrame;
+		mutable Mutex mSkipFrameLock;
+		int mSkipFrame;
 
-    V4L2Camera         *mCamera;
-    bool                mPreviewRunning;	
-    int                 mPreviewFrameSize;
+		V4L2Camera *mCamera;
+		bool mPreviewRunning;
+		int mPreviewFrameSize;
 
-	int mPreviewWidth;
-	int mPreviewHeight;
-	static const char supportedPictureSizes_ffc[];
-	static const char supportedPictureSizes_bfc[];
-	static const char supportedPreviewSizes_ffc[];
-	static const char supportedPreviewSizes_bfc[];
-    
-	mutable Mutex mFocusLock;
-    	mutable Condition mFocusCondition;
-    	bool 	 	mExitAutoFocusThread;
+		int mPreviewWidth;
+		int mPreviewHeight;
+		static const char supportedPictureSizes_ffc[];
+		static const char supportedPictureSizes_bfc[];
+		static const char supportedPreviewSizes_ffc[];
+		static const char supportedPreviewSizes_bfc[];
 
-    sp<AutoFocusThread> mAutoFocusThread;
-            int autoFocusThread();
+		mutable Mutex mFocusLock;
+		mutable Condition mFocusCondition;
+		bool mExitAutoFocusThread;
 
-    /* protected by mLock */
-    sp<PreviewThread>   mPreviewThread;
+		sp < AutoFocusThread > mAutoFocusThread;
+		int autoFocusThread();
 
-    sp<PictureThread> mPictureThread;
-            int pictureThread();
+		/* protected by mLock */
+		sp < PreviewThread > mPreviewThread;
 
-    camera_notify_callback     mNotifyCb;
-    camera_data_callback       mDataCb;
-    camera_data_timestamp_callback mDataCbTimestamp;
-    void               *mCallbackCookie;
+		sp < PictureThread > mPictureThread;
+		int pictureThread();
 
-    int32_t             mMsgEnabled;
+		camera_notify_callback mNotifyCb;
+		camera_data_callback mDataCb;
+		camera_data_timestamp_callback mDataCbTimestamp;
+		void *mCallbackCookie;
 
-    bool                previewStopped;
-    bool                mRecordingEnabled;
+		int32_t mMsgEnabled;
 
-			double mPreviousGPSLatitude;
-			double mPreviousGPSLongitude;
-			double mPreviousGPSAltitude;
-			long mPreviousGPSTimestamp;
-			struct tm *m_timeinfo;
-			char m_gps_date[11];
-			time_t m_gps_time;
-			int m_gpsHour;
-			int m_gpsMin;
-			int m_gpsSec;
-			char mPreviousGPSProcessingMethod[150];
-			int mThumbnailWidth;
-			int mThumbnailHeight;
-			int mPreviousSceneMode;
-			int mPreviousFlashMode;
-			int mPreviousBrightness;
-			int mPreviousExposure;
-			int mPreviousZoom;
-			int mPreviousISO;
-			int mPreviousContrast;
-			int mPreviousSaturation;
-			int mPreviousSharpness;
-			int mPreviousMetering;
-};
+		bool previewStopped;
+		bool mRecordingEnabled;
 
-}; // namespace android
-extern "C" {
-int scale_init(int inWidth, int inHeight, int outWidth, int outHeight, int inFmt, int outFmt);
-int scale_deinit();
-int scale_process(void* inBuffer, int inWidth, int inHeight, void* outBuffer, int outWidth, int outHeight, int rotation, int fmt, float zoom);
-}
+		double mPreviousGPSLatitude;
+		double mPreviousGPSLongitude;
+		double mPreviousGPSAltitude;
+		long mPreviousGPSTimestamp;
+		struct tm *m_timeinfo;
+		char m_gps_date[11];
+		time_t m_gps_time;
+		int m_gpsHour;
+		int m_gpsMin;
+		int m_gpsSec;
+		char mPreviousGPSProcessingMethod[150];
+		int mThumbnailWidth;
+		int mThumbnailHeight;
+		int mPreviousSceneMode;
+		int mPreviousFlashMode;
+		int mPreviousBrightness;
+		int mPreviousExposure;
+		int mPreviousZoom;
+		int mPreviousISO;
+		int mPreviousContrast;
+		int mPreviousSaturation;
+		int mPreviousSharpness;
+		int mPreviousMetering;
+	};
+
+};				// namespace android
 
 extern "C" {
-int ColorConvert_Init(int , int , int);
-int ColorConvert_Deinit();
-int ColorConvert_Process(char *, char *);
+	int scale_init(int inWidth, int inHeight, int outWidth, int outHeight,
+		       int inFmt, int outFmt);
+	int scale_deinit();
+	int scale_process(void *inBuffer, int inWidth, int inHeight,
+			  void *outBuffer, int outWidth, int outHeight,
+			  int rotation, int fmt, float zoom);
+} extern "C" {
+	int ColorConvert_Init(int, int, int);
+	int ColorConvert_Deinit();
+	int ColorConvert_Process(char *, char *);
 
-void Neon_Convert_yuv422_to_NV21(unsigned char * aSrcBufPtr, unsigned char * aDstBufPtr,unsigned int aFramewidth,unsigned int aFrameHeight);
-void Neon_Convert_yuv422_to_NV12(unsigned char * aSrcBufPtr, unsigned char * aDstBufPtr,unsigned int aFramewidth,unsigned int aFrameHeight);
-void Neon_Convert_yuv422_to_YUV420P(unsigned char * aSrcBufPtr, unsigned char * aDstBufPtr,unsigned int aFramewidth,unsigned int aFrameHeight);
-void UYVYToI420(unsigned char * aSrcBufPtr, unsigned char * aDstBufPtr,unsigned int aFramewidth,unsigned int aFrameHeight);
+	void Neon_Convert_yuv422_to_NV21(unsigned char *aSrcBufPtr,
+					 unsigned char *aDstBufPtr,
+					 unsigned int aFramewidth,
+					 unsigned int aFrameHeight);
+	void Neon_Convert_yuv422_to_NV12(unsigned char *aSrcBufPtr,
+					 unsigned char *aDstBufPtr,
+					 unsigned int aFramewidth,
+					 unsigned int aFrameHeight);
+	void Neon_Convert_yuv422_to_YUV420P(unsigned char *aSrcBufPtr,
+					    unsigned char *aDstBufPtr,
+					    unsigned int aFramewidth,
+					    unsigned int aFrameHeight);
+	void UYVYToI420(unsigned char *aSrcBufPtr, unsigned char *aDstBufPtr,
+			unsigned int aFramewidth, unsigned int aFrameHeight);
 }
 #endif
