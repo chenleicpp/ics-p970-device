@@ -219,10 +219,6 @@ namespace android {
 			p.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 			p.setPreviewFrameRate(30);
 
-			// touch focus
-			p.set(CameraParameters::KEY_MAX_NUM_FOCUS_AREAS, "1");
-			p.set(CameraParameters::KEY_FOCUS_AREAS, "(0,0,0,0,0)");
-
 			// zoom
 			p.set(CameraParameters::KEY_ZOOM, "0");
 			p.set(CameraParameters::KEY_MAX_ZOOM, "12");
@@ -307,13 +303,6 @@ namespace android {
 		p.set(p.KEY_GPS_ALTITUDE, "0");
 		p.set(p.KEY_GPS_TIMESTAMP, "0");
 		p.set(p.KEY_GPS_PROCESSING_METHOD, "GPS");
-
-		//Extra Parameters - GalaxySL
-		mCamera->setISO(ISO_AUTO);
-    	mCamera->setMetering(METERING_CENTER);
-    	mCamera->setContrast(CONTRAST_DEFAULT);
-    	mCamera->setSharpness(SHARPNESS_DEFAULT);
-    	mCamera->setSaturation(SATURATION_DEFAULT);
     	
 		if (setParameters(p) != NO_ERROR) {
 			LOGE("Failed to set default parameters?!");
