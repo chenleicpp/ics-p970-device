@@ -126,7 +126,7 @@ namespace android {
 					   PIXEL_FORMAT_YUV420SP);
 			p.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 			p.setPictureFormat(CameraParameters::PIXEL_FORMAT_JPEG);
-			p.set(CameraParameters::KEY_JPEG_QUALITY, 100);
+			p.set(CameraParameters::KEY_JPEG_QUALITY, 90);
 			p.set("picture-size-values",
 			      CameraHardware::supportedPictureSizes_ffc);
 
@@ -160,19 +160,19 @@ namespace android {
 			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,
 			      "(7500,30000)");
 			p.set(CameraParameters::KEY_PREVIEW_FPS_RANGE,
-			      "7500,30000");
+			      "30000,30000");
 
-			p.set(CameraParameters::KEY_FOCAL_LENGTH, "0.9");
+			p.set(CameraParameters::KEY_FOCAL_LENGTH, "3.67");
 
 			p.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-			p.setPreviewFrameRate(15);
+			p.setPreviewFrameRate(30);
 
 		} else {
 			p.setPreviewFormat(CameraParameters::
 					   PIXEL_FORMAT_YUV420SP);
 			p.setPictureSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 			p.setPictureFormat(CameraParameters::PIXEL_FORMAT_JPEG);
-			p.set(CameraParameters::KEY_JPEG_QUALITY, 100);
+			p.set(CameraParameters::KEY_JPEG_QUALITY, 90);
 			p.set("picture-size-values",
 			      CameraHardware::supportedPictureSizes_bfc);
 
@@ -184,6 +184,8 @@ namespace android {
 			      CameraHardware::supportedPreviewSizes_bfc);
 			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
 			      CameraParameters::PIXEL_FORMAT_YUV420SP);
+			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
+			      CameraParameters::PIXEL_FORMAT_YUV422I);
 			p.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT,
 			      CameraParameters::PIXEL_FORMAT_YUV422I);
 
@@ -212,9 +214,9 @@ namespace android {
 			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,
 			      "(15000,30000)");
 			p.set(CameraParameters::KEY_PREVIEW_FPS_RANGE,
-			      "15000,30000");
+			      "30000,30000");
 
-			p.set(CameraParameters::KEY_FOCAL_LENGTH, "3.43");
+			p.set(CameraParameters::KEY_FOCAL_LENGTH, "3.67");
 
 			p.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 			p.setPreviewFrameRate(30);
@@ -289,12 +291,12 @@ namespace android {
 		      parameterString.string());
 
 		p.set(CameraParameters::KEY_EXPOSURE_COMPENSATION, "0");
-		p.set(CameraParameters::KEY_MAX_EXPOSURE_COMPENSATION, "4");
-		p.set(CameraParameters::KEY_MIN_EXPOSURE_COMPENSATION, "-4");
-		p.set(CameraParameters::KEY_EXPOSURE_COMPENSATION_STEP, "0.5");
+		p.set(CameraParameters::KEY_MAX_EXPOSURE_COMPENSATION, "20");
+		p.set(CameraParameters::KEY_MIN_EXPOSURE_COMPENSATION, "-20");
+		p.set(CameraParameters::KEY_EXPOSURE_COMPENSATION_STEP, "0.1");
 
-		p.set(CameraParameters::KEY_HORIZONTAL_VIEW_ANGLE, "51.2");
-		p.set(CameraParameters::KEY_VERTICAL_VIEW_ANGLE, "39.4");
+		p.set(CameraParameters::KEY_HORIZONTAL_VIEW_ANGLE, "47.11");
+		p.set(CameraParameters::KEY_VERTICAL_VIEW_ANGLE, "36.21");
 
 		p.set(p.KEY_ROTATION, "0");
 
