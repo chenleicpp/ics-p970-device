@@ -189,19 +189,14 @@ namespace android {
 			p.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT,
 			      CameraParameters::PIXEL_FORMAT_YUV422I);
 
-			parameterString = CameraParameters::FOCUS_MODE_AUTO;
-			parameterString.append(",");
-			parameterString.
-			    append(CameraParameters::FOCUS_MODE_MACRO);
-			parameterString.append(",");
-			parameterString.append(FOCUS_MODE_FACEDETECTION);
+			parameterString = CameraParameters::FOCUS_MODE_FIXED;
 			p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
 			      parameterString.string());
-
 			p.set(CameraParameters::KEY_FOCUS_MODE,
-			      CameraParameters::FOCUS_MODE_AUTO);
+			      CameraParameters::FOCUS_MODE_FIXED);
 			p.set(CameraParameters::KEY_FOCUS_DISTANCES,
-			      BACK_CAMERA_AUTO_FOCUS_DISTANCES_STR);
+			      FRONT_CAMERA_FOCUS_DISTANCES_STR);
+			      
 			p.set(CameraParameters::
 			      KEY_SUPPORTED_JPEG_THUMBNAIL_SIZES,
 			      "320x240,0x0");
@@ -222,6 +217,7 @@ namespace android {
 			p.setPreviewFrameRate(30);
 
 			// zoom
+			
 			p.set(CameraParameters::KEY_ZOOM, "0");
 			p.set(CameraParameters::KEY_MAX_ZOOM, "12");
 			p.set(CameraParameters::KEY_ZOOM_RATIOS,
