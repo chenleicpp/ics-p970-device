@@ -218,7 +218,7 @@ char *camera_get_parameters(struct camera_device *device)
 	// camera service frees this string...
 	param = (char *)malloc(sizeof(char) * (params_str8.length() + 1));
 	strcpy(param, params_str8.string());
-	LOGV("%s", param);
+	LOGD("%s", param);
 	LOG_FUNCTION_NAME return param;
 }
 

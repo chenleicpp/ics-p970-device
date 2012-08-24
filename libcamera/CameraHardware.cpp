@@ -176,6 +176,14 @@ namespace android {
 			p.set("picture-size-values",
 			      CameraHardware::supportedPictureSizes_bfc);
 
+			parameterString = CameraParameters::FOCUS_MODE_FIXED;
+			p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
+			      parameterString.string());
+			p.set(CameraParameters::KEY_FOCUS_MODE,
+			      CameraParameters::FOCUS_MODE_FIXED);
+			p.set(CameraParameters::KEY_FOCUS_DISTANCES,
+			      FRONT_CAMERA_FOCUS_DISTANCES_STR);
+
 			p.set(CameraParameters::KEY_SUPPORTED_PICTURE_SIZES,
 			      CameraHardware::supportedPictureSizes_bfc);
 			p.set(CameraParameters::KEY_SUPPORTED_PICTURE_FORMATS,
@@ -184,18 +192,10 @@ namespace android {
 			      CameraHardware::supportedPreviewSizes_bfc);
 			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
 			      CameraParameters::PIXEL_FORMAT_YUV420SP);
-			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
-			      CameraParameters::PIXEL_FORMAT_YUV422I);
+//			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
+//			      CameraParameters::PIXEL_FORMAT_YUV422I);
 			p.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT,
 			      CameraParameters::PIXEL_FORMAT_YUV422I);
-
-			parameterString = CameraParameters::FOCUS_MODE_FIXED;
-			p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
-			      parameterString.string());
-			p.set(CameraParameters::KEY_FOCUS_MODE,
-			      CameraParameters::FOCUS_MODE_FIXED);
-			p.set(CameraParameters::KEY_FOCUS_DISTANCES,
-			      FRONT_CAMERA_FOCUS_DISTANCES_STR);
 			      
 			p.set(CameraParameters::
 			      KEY_SUPPORTED_JPEG_THUMBNAIL_SIZES,
@@ -355,10 +355,10 @@ namespace android {
 	}
 
 	sp < IMemoryHeap > CameraHardware::getPreviewHeap()const {
-		LOGV("Preview Heap");
+		LOGD("Preview Heap");
 		return mPreviewHeap;
 	} sp < IMemoryHeap > CameraHardware::getRawHeap() const {
-		LOGV("Raw Heap");
+		LOGD("Raw Heap");
 		return mRawHeap;
 	} void CameraHardware::setCallbacks(camera_notify_callback notify_cb,
 					    camera_data_callback data_cb,
@@ -408,17 +408,17 @@ namespace android {
 	}
 
 	void CameraHardware::enableMsgType(int32_t msgType) {
-		LOGV("enableMsgType:%d", msgType);
+		LOGD("enableMsgType:%d", msgType);
 		mMsgEnabled |= msgType;
 	}
 
 	void CameraHardware::disableMsgType(int32_t msgType) {
-		LOGV("disableMsgType:%d", msgType);
+		LOGD("disableMsgType:%d", msgType);
 		mMsgEnabled &= ~msgType;
 	}
 
 	bool CameraHardware::msgTypeEnabled(int32_t msgType) {
-		LOGV("msgTypeEnabled:%d", msgType);
+		LOGD("msgTypeEnabled:%d", msgType);
 		return (mMsgEnabled & msgType);
 	}
 
@@ -483,7 +483,7 @@ namespace android {
 			mSkipFrame--;
 			void *mSkipFrameBuf = mCamera->GrabPreviewFrame();
 			mSkipFrameLock.unlock();
-			LOGV("%s: index %d skipping frame", __func__, index);
+			LOGD("%s: index %d skipping frame", __func__, index);
 			return NO_ERROR;
 		}
 		mSkipFrameLock.unlock();
@@ -671,24 +671,24 @@ namespace android {
 			Mutex::Autolock lock(mPreviewLock);
 			previewStopped = true;
 			previewThread = mPreviewThread;
-			LOGV("scope for the lock");
+			LOGD("scope for the lock");
 		}
 
 		/* don't hold the lock while waiting for the thread to quit */
 		if (previewThread != 0) {
 			previewThread->requestExitAndWait();
-			LOGV("previewThread->requestExitAndWait();");
+			LOGD("previewThread->requestExitAndWait();");
 		}
 
 		if (mPreviewThread != 0) {
 			mCamera->Uninit(0);
 			mCamera->StopStreaming();
-			LOGV(" mCamera->StopStreaming();");
+			LOGD(" mCamera->StopStreaming();");
 		}
 
 		Mutex::Autolock lock(mPreviewLock);
 		mPreviewThread.clear();
-		LOGV("return");
+		LOGD("return");
 		return;
 	}
 
@@ -754,7 +754,7 @@ namespace android {
 
 	int CameraHardware::beginAutoFocusThread(void *cookie) {
 		CameraHardware *c = (CameraHardware *) cookie;
-		LOGV("beginAutoFocusThread");
+		LOGD("beginAutoFocusThread");
 		return c->autoFocusThread();
 	}
 
@@ -762,7 +762,7 @@ namespace android {
 		int count = 0;
 		int af_status = 0;
 
-		LOGV("%s : starting", __func__);
+		LOGD("%s : starting", __func__);
 
 		//dhiru1602 :  Release focus lock when autofocus is called again.
 		mCamera->setAEAWBLockUnlock(0, 0);
@@ -778,18 +778,18 @@ namespace android {
 		/* check early exit request */
 		if (mExitAutoFocusThread) {
 			mFocusLock.unlock();
-			LOGV("%s : exiting on request0", __func__);
+			LOGD("%s : exiting on request0", __func__);
 			return NO_ERROR;
 		}
 		mFocusCondition.wait(mFocusLock);
 		/* check early exit request */
 		if (mExitAutoFocusThread) {
 			mFocusLock.unlock();
-			LOGV("%s : exiting on request1", __func__);
+			LOGD("%s : exiting on request1", __func__);
 			return NO_ERROR;
 		}
 		mFocusLock.unlock();
-		LOGV("%s : calling setAutoFocus", __func__);
+		LOGD("%s : calling setAutoFocus", __func__);
 		if (mCamera->setAutofocus() < 0) {
 			LOGE("ERR(%s):Fail on mSecCamera->setAutofocus()",
 			     __func__);
@@ -799,12 +799,12 @@ namespace android {
 		af_status = mCamera->getAutoFocusResult();
 
 		if (af_status == 0x01) {
-			LOGV("%s : AF Success!!", __func__);
+			LOGD("%s : AF Success!!", __func__);
 			if (mMsgEnabled & CAMERA_MSG_FOCUS)
 				mNotifyCb(CAMERA_MSG_FOCUS, true, 0,
 					  mCallbackCookie);
 		} else if (af_status == 0x02) {
-			LOGV("%s : AF Cancelled !!", __func__);
+			LOGD("%s : AF Cancelled !!", __func__);
 			if (mMsgEnabled & CAMERA_MSG_FOCUS) {
 				/* CAMERA_MSG_FOCUS only takes a bool. true for
 				 * finished and false for failure. cancel is still
@@ -814,14 +814,14 @@ namespace android {
 					  mCallbackCookie);
 			}
 		} else {
-			LOGV("%s : AF Fail !!", __func__);
-			LOGV("%s : mMsgEnabled = 0x%x", __func__, mMsgEnabled);
+			LOGD("%s : AF Fail !!", __func__);
+			LOGD("%s : mMsgEnabled = 0x%x", __func__, mMsgEnabled);
 			if (mMsgEnabled & CAMERA_MSG_FOCUS)
 				mNotifyCb(CAMERA_MSG_FOCUS, false, 0,
 					  mCallbackCookie);
 		}
 
-		LOGV("%s : exiting with no error", __func__);
+		LOGD("%s : exiting with no error", __func__);
 		return NO_ERROR;
 	}
 
@@ -864,12 +864,12 @@ namespace android {
 		char devnode[12];
 		camera_memory_t *picture;
 
-		LOGV("Picture Thread:%d", mMsgEnabled);
+		LOGD("Picture Thread:%d", mMsgEnabled);
 		if (mMsgEnabled & CAMERA_MSG_SHUTTER)
 			mNotifyCb(CAMERA_MSG_SHUTTER, 0, 0, mCallbackCookie);
 
 		mParameters.getPictureSize(&w, &h);
-		LOGV("Picture Size: Width = %d \t Height = %d", w, h);
+		LOGD("Picture Size: Width = %d \t Height = %d", w, h);
 
 		int width, height;
 		mParameters.getPictureSize(&width, &height);
@@ -879,6 +879,9 @@ namespace android {
 		if (mCameraID == CAMERA_FF) {
 			fps = 15;
 			pixelformat = PIXEL_FORMAT;
+		} else {
+	//		fps = 30;
+			pixelformat = PIXEL_FORMAT;  //by qiwu.huang
 		}
 		ret = mCamera->Configure(width, height, pixelformat, fps, 1);
 		if (ret < 0) {
@@ -915,17 +918,21 @@ namespace android {
 		}
 		//TODO xxx : Optimize the memory capture call. Too many memcpy
 		if (mMsgEnabled & CAMERA_MSG_COMPRESSED_IMAGE) {
-			LOGV("mJpegPictureCallback");
+			LOGD("mJpegPictureCallback");
+			LOGD("=====[QIWU]=====mCameraID is %d",mCameraID);
 			unsigned long JpegImageSize;
-			if (mCameraID == CAMERA_FF)
+//			if (mCameraID == CAMERA_FF){  //by qiwu.huang
+			LOGD("=====[QIWU]=====GrabJpegFramemRequestMemory,JpegImageSize, true");
 				picture =
 				    mCamera->GrabJpegFrame(mRequestMemory,
 							   JpegImageSize, true);
-			else
-				picture =
-				    mCamera->GrabJpegFrame(mRequestMemory,
-							   JpegImageSize,
-							   false);
+//			}else{
+//			LOGD("=====[QIWU]=====GrabJpegFramemRequestMemory,JpegImageSize, false");
+//				picture =
+//				    mCamera->GrabJpegFrame(mRequestMemory,
+//							   JpegImageSize,
+//							   false);
+//						   }
 			unsigned char *pExifBuf = new unsigned char[65536];
 			int JpegExifSize;
 
@@ -959,12 +966,12 @@ namespace android {
 		mCamera->Uninit(1);
 		mCamera->StopStreaming();
 
-		LOGV("End pictureThread()");
+		LOGD("End pictureThread()");
 		return NO_ERROR;
 	}
 
 	status_t CameraHardware::takePicture() {
-		LOGV("pictureThread()");
+		LOGD("pictureThread()");
 		stopPreview();
 		if (mPictureThread->
 		    run("CameraPictureThread", PRIORITY_DEFAULT) != NO_ERROR) {
@@ -976,10 +983,10 @@ namespace android {
 
 	status_t CameraHardware::cancelPicture() {
 		if (mPictureThread.get()) {
-			LOGV("%s: waiting for picture thread to exit",
+			LOGD("%s: waiting for picture thread to exit",
 			     __func__);
 			mPictureThread->requestExitAndWait();
-			LOGV("%s: picture thread has exited", __func__);
+			LOGD("%s: picture thread has exited", __func__);
 		}
 		return NO_ERROR;
 	}
@@ -994,9 +1001,9 @@ namespace android {
 		int ret;
 		params.getPreviewSize(&width, &height);
 
-		LOGV("Set Parameter...!! ");
+		LOGD("Set Parameter...!! ");
 
-		LOGV("PreviewFormat %s", params.getPreviewFormat());
+		LOGD("PreviewFormat %s", params.getPreviewFormat());
 		if (params.getPreviewFormat() != NULL) {
 			if (strcmp
 			    (params.getPreviewFormat(),
@@ -1007,7 +1014,7 @@ namespace android {
 			}
 		}
 
-		LOGV("PictureFormat %s", params.getPictureFormat());
+		LOGD("PictureFormat %s", params.getPictureFormat());
 		if (params.getPictureFormat() != NULL) {
 			if (strcmp
 			    (params.getPictureFormat(),
@@ -1019,21 +1026,21 @@ namespace android {
 		}
 
 		framerate = params.getPreviewFrameRate();
-		LOGV("FRAMERATE %d", framerate);
+		LOGD("FRAMERATE %d", framerate);
 
 		mParameters = params;
 
 		mParameters.getPictureSize(&width, &height);
-		LOGV("Picture Size by CamHAL %d x %d", width, height);
+		LOGD("Picture Size by CamHAL %d x %d", width, height);
 
 		mParameters.getPreviewSize(&width, &height);
-		LOGV("Preview Resolution by CamHAL %d x %d", width, height);
+		LOGD("Preview Resolution by CamHAL %d x %d", width, height);
 		mParameters.setPreviewSize(width, height);
 
 		// whitebalance
 		const char *new_white_str =
 		    params.get(CameraParameters::KEY_WHITE_BALANCE);
-		LOGV("%s : new_white_str %s", __func__, new_white_str);
+		LOGD("%s : new_white_str %s", __func__, new_white_str);
 		if (new_white_str != NULL) {
 			int new_white = -1;
 
@@ -1082,7 +1089,7 @@ namespace android {
 		int min_exposure_compensation =
 		    params.
 		    getInt(CameraParameters::KEY_MIN_EXPOSURE_COMPENSATION);
-		LOGV("%s : new_exposure_compensation %d", __func__,
+		LOGD("%s : new_exposure_compensation %d", __func__,
 		     new_exposure_compensation);
 		if ((min_exposure_compensation <= new_exposure_compensation)
 		    && (max_exposure_compensation >=
@@ -1297,9 +1304,9 @@ namespace android {
 			    params.getInt(CameraParameters::KEY_ZOOM);
 			int max_zoom =
 			    params.getInt(CameraParameters::KEY_MAX_ZOOM);
-			LOGV("%s : new_zoom %d", __func__, new_zoom);
+			LOGD("%s : new_zoom %d", __func__, new_zoom);
 			if (0 <= new_zoom && new_zoom <= max_zoom) {
-				LOGV("%s : set zoom:%d\n", __func__, new_zoom);
+				LOGD("%s : set zoom:%d\n", __func__, new_zoom);
 				if (mCamera->setZoom(new_zoom) < 0) {
 					LOGE("ERR(%s):Fail on Camera->setZoom(%d)", __func__, new_zoom);
 				} else {
@@ -1313,7 +1320,7 @@ namespace android {
 		int new_rotation =
 		    params.getInt(CameraParameters::KEY_ROTATION);
 		if (0 <= new_rotation) {
-			LOGV("%s : set orientation:%d\n", __func__,
+			LOGD("%s : set orientation:%d\n", __func__,
 			     new_rotation);
 			if (mCamera->setExifOrientationInfo(new_rotation) < 0) {
 				LOGE("ERR(%s):Fail on mCamera->setExifOrientationInfo(%d)", __func__, new_rotation);
