@@ -70,8 +70,10 @@ namespace android {
 
 /* 29/12/10 : preview/picture size validation logic */
 	const char CameraHardware::supportedPictureSizes_ffc[] = "640x480";
+	//const char CameraHardware::supportedPictureSizes_bfc[] =
+	//    "2560x1920,2560x1536,2048x1536,2048x1232,1600x1200,1600x960,800x480,640x480";
 	const char CameraHardware::supportedPictureSizes_bfc[] =
-	    "2560x1920,2560x1536,2048x1536,2048x1232,1600x1200,1600x960,800x480,640x480";
+	    "640x480,800x480";
 	const char CameraHardware::supportedPreviewSizes_ffc[] =
 	    "640x480,320x240,176x144";
 	const char CameraHardware::supportedPreviewSizes_bfc[] =
@@ -176,13 +178,8 @@ namespace android {
 			p.set("picture-size-values",
 			      CameraHardware::supportedPictureSizes_bfc);
 
-			parameterString = CameraParameters::FOCUS_MODE_FIXED;
-			p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
-			      parameterString.string());
 			p.set(CameraParameters::KEY_FOCUS_MODE,
 			      CameraParameters::FOCUS_MODE_FIXED);
-			p.set(CameraParameters::KEY_FOCUS_DISTANCES,
-			      FRONT_CAMERA_FOCUS_DISTANCES_STR);
 
 			p.set(CameraParameters::KEY_SUPPORTED_PICTURE_SIZES,
 			      CameraHardware::supportedPictureSizes_bfc);
@@ -192,10 +189,6 @@ namespace android {
 			      CameraHardware::supportedPreviewSizes_bfc);
 			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
 			      CameraParameters::PIXEL_FORMAT_YUV420SP);
-//			p.set(CameraParameters::KEY_SUPPORTED_PREVIEW_FORMATS,
-//			      CameraParameters::PIXEL_FORMAT_YUV422I);
-			p.set(CameraParameters::KEY_VIDEO_FRAME_FORMAT,
-			      CameraParameters::PIXEL_FORMAT_YUV422I);
 			      
 			p.set(CameraParameters::
 			      KEY_SUPPORTED_JPEG_THUMBNAIL_SIZES,
@@ -874,15 +867,8 @@ namespace android {
 		int width, height;
 		mParameters.getPictureSize(&width, &height);
 		int fps = mParameters.getPreviewFrameRate();
-		int pixelformat = V4L2_PIX_FMT_JPEG;
+		int pixelformat = PIXEL_FORMAT;
 
-		if (mCameraID == CAMERA_FF) {
-			fps = 15;
-			pixelformat = PIXEL_FORMAT;
-		} else {
-	//		fps = 30;
-			pixelformat = PIXEL_FORMAT;  //by qiwu.huang
-		}
 		ret = mCamera->Configure(width, height, pixelformat, fps, 1);
 		if (ret < 0) {
 			LOGE("Fail to configure camera device");
@@ -919,15 +905,12 @@ namespace android {
 		//TODO xxx : Optimize the memory capture call. Too many memcpy
 		if (mMsgEnabled & CAMERA_MSG_COMPRESSED_IMAGE) {
 			LOGD("mJpegPictureCallback");
-			LOGD("=====[QIWU]=====mCameraID is %d",mCameraID);
 			unsigned long JpegImageSize;
 //			if (mCameraID == CAMERA_FF){  //by qiwu.huang
-			LOGD("=====[QIWU]=====GrabJpegFramemRequestMemory,JpegImageSize, true");
 				picture =
 				    mCamera->GrabJpegFrame(mRequestMemory,
 							   JpegImageSize, true);
 //			}else{
-//			LOGD("=====[QIWU]=====GrabJpegFramemRequestMemory,JpegImageSize, false");
 //				picture =
 //				    mCamera->GrabJpegFrame(mRequestMemory,
 //							   JpegImageSize,
