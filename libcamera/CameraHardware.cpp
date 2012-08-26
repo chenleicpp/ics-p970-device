@@ -1383,8 +1383,8 @@ namespace android {
 
 		memset(&ExifInfo, NULL, sizeof(ExifInfoStructure));
 
-		strcpy((char *)&ExifInfo.maker, "SAMSUNG");
-		strcpy((char *)&ExifInfo.model, "GT-I9003");
+		strcpy((char *)&ExifInfo.maker, "LG");
+		strcpy((char *)&ExifInfo.model, "p970");
 
 		mParameters.getPreviewSize(&w, &h);
 
