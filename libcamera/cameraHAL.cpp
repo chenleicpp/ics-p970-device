@@ -38,20 +38,49 @@ int camera_get_camera_info(int camera_id, struct camera_info *info);
 int camera_get_number_of_cameras(void);
 
 struct legacy_camera_device {
-   	camera_device_t device;
-   	android::sp<android::CameraHardwareInterface> hwif;
-   	int id;
+   camera_device_t device;
+   android::sp<android::CameraHardwareInterface> hwif;
+   int id;
 
-   	camera_notify_callback         notify_callback;
-   	camera_data_callback           data_callback;
-  	camera_data_timestamp_callback data_timestamp_callback;
-   	camera_request_memory          request_memory;
-   	void                          *user;
+   camera_notify_callback         notify_callback;
+   camera_data_callback           data_callback;
+   camera_data_timestamp_callback data_timestamp_callback;
+   camera_request_memory          request_memory;
+   void                          *user;
 
-   	preview_stream_ops *window;
-   	gralloc_module_t const *gralloc;
-   	camera_memory_t *clientData;
+   preview_stream_ops *window;
+   gralloc_module_t const *gralloc;
+   camera_memory_t *clientData;
 };
+
+static struct {
+    int type;
+    const char *text;
+} msg_map[] = {
+    {0x0001, "CAMERA_MSG_ERROR"},
+    {0x0002, "CAMERA_MSG_SHUTTER"},
+    {0x0004, "CAMERA_MSG_FOCUS"},
+    {0x0008, "CAMERA_MSG_ZOOM"},
+    {0x0010, "CAMERA_MSG_PREVIEW_FRAME"},
+    {0x0020, "CAMERA_MSG_VIDEO_FRAME"},
+    {0x0040, "CAMERA_MSG_POSTVIEW_FRAME"},
+    {0x0080, "CAMERA_MSG_RAW_IMAGE"},
+    {0x0100, "CAMERA_MSG_COMPRESSED_IMAGE"},
+    {0x0200, "CAMERA_MSG_RAW_IMAGE_NOTIFY"},
+    {0x0400, "CAMERA_MSG_PREVIEW_METADATA"},
+    {0x0000, "CAMERA_MSG_ALL_MSGS"}, //0xFFFF
+    {0x0000, "NULL"},
+};
+
+static void dump_msg(const char *tag, int msg_type)
+{
+    int i;
+    for (i = 0; msg_map[i].type; i++) {
+        if (msg_type & msg_map[i].type) {
+            LOGD("%s: %s", tag, msg_map[i].text);
+        }
+    }
+}
 
 static hw_module_methods_t camera_module_methods = {
    open: camera_device_open
@@ -72,6 +101,109 @@ camera_module_t HAL_MODULE_INFO_SYM = {
    get_number_of_cameras: camera_get_number_of_cameras,
    get_camera_info: camera_get_camera_info,
 };
+
+static inline struct legacy_camera_device * to_lcdev(struct camera_device *dev)
+{
+    return reinterpret_cast<struct legacy_camera_device *>(dev);
+}
+
+camera_memory_t * wrap_memory_data(const android::sp<android::IMemory> &dataPtr,
+                        void *user)
+{
+   LOG_FUNCTION_NAME
+   ssize_t          offset;
+   size_t           size;
+   camera_memory_t *clientData = NULL;
+   struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
+   android::sp<android::IMemoryHeap> mHeap = dataPtr->getMemory(&offset, &size);
+
+   //LOGV("CameraHAL_GenClientData: offset:%#x size:%#x base:%p\n",
+   //     (unsigned)offset, size, mHeap != NULL ? mHeap->base() : 0);
+
+   //LOGV("%s: #1", __FUNCTION__);
+   clientData = lcdev->request_memory(-1, size, 1, lcdev->user);
+   //LOGV("%s: #2", __FUNCTION__);
+   if (clientData != NULL) {
+      memcpy(clientData->data, (char *)(mHeap->base()) + offset, size);
+   //LOGV("%s: #3", __FUNCTION__);
+   } else {
+      LOGE("wrap_memory_data: ERROR allocating memory from client\n");
+   }
+   return clientData;
+}
+
+void wrap_notify_callback(int32_t msg_type, int32_t ext1,
+                   int32_t ext2, void *user)
+{
+   LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
+   LOGD("%s: msg_type:%d ext1:%d ext2:%d user:%p\n",__FUNCTION__,
+        msg_type, ext1, ext2, user);
+   dump_msg(__FUNCTION__, msg_type);
+   if (lcdev->notify_callback != NULL) {
+      lcdev->notify_callback(msg_type, ext1, ext2, lcdev->user);
+   }
+}
+
+void wrap_data_callback(int32_t msg_type, const android::sp<android::IMemory>& dataPtr,
+                 void *user)
+{
+   LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
+
+   LOGD("%s: msg_type:%d user:%p\n",__FUNCTION__,msg_type, user);
+   dump_msg(__FUNCTION__, msg_type);
+
+   if (lcdev->data_callback != NULL && lcdev->request_memory != NULL) {
+      /* Make sure any pre-existing heap is released */
+      if (lcdev->clientData != NULL) {
+         lcdev->clientData->release(lcdev->clientData);
+         lcdev->clientData = NULL;
+      }
+      lcdev->clientData = wrap_memory_data(dataPtr, lcdev);
+      if (lcdev->clientData != NULL) {
+         //LOGV("CameraHAL_DataCb: Posting data to client\n");
+         lcdev->data_callback(msg_type, lcdev->clientData, 0, NULL, lcdev->user);
+      }
+   }
+#if 0
+   if (msg_type == CAMERA_MSG_PREVIEW_FRAME) {
+      int32_t previewWidth, previewHeight;
+      android::CameraParameters hwParameters(lcdev->hwif->getParameters());
+      hwParameters.getPreviewSize(&previewWidth, &previewHeight);
+      LOGD("CameraHAL_DataCb: preview size = %dx%d\n", previewWidth, previewHeight);
+      CameraHAL_HandlePreviewData(dataPtr, previewWidth, previewHeight, lcdev);
+   }
+#else
+#endif
+}
+
+void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
+                   const android::sp<android::IMemory>& dataPtr, void *user)
+{
+   LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
+
+   LOGD("%s: timestamp:%lld msg_type:%d user:%p\n",__FUNCTION__,
+        timestamp /1000, msg_type, user);
+   dump_msg(__FUNCTION__, msg_type);
+
+   if (lcdev->data_callback != NULL && lcdev->request_memory != NULL) {
+      camera_memory_t *clientData = wrap_memory_data(dataPtr, lcdev);
+      if (clientData != NULL) {
+         LOGD("wrap_data_callback_timestamp: Posting data to client timestamp:%lld\n",
+              systemTime());
+         lcdev->data_timestamp_callback(timestamp, msg_type, clientData, 0, lcdev->user);
+         lcdev->hwif->releaseRecordingFrame(dataPtr);
+      } else {
+         LOGD("wrap_data_callback_timestamp: ERROR allocating memory from client\n");
+      }
+   }
+}
+
+/*******************************************************************
+ * implementation of camera_device_ops_t functions
+ *******************************************************************/
 
 int camera_get_camera_info(int camera_id, struct camera_info *info)
 {
@@ -97,72 +229,98 @@ int camera_get_number_of_cameras(void)
 int camera_set_preview_window(struct camera_device * device,
                            struct preview_stream_ops *window)
 {
-	return NO_ERROR;
+   LOG_FUNCTION_NAME
+   	return NO_ERROR;
 }
+
+
 
 void camera_set_callbacks(struct camera_device * device,
                       camera_notify_callback notify_cb,
                       camera_data_callback data_cb,
                       camera_data_timestamp_callback data_cb_timestamp,
-                      camera_request_memory get_memory, void *user)
+                      camera_request_memory get_memory, 
+                      void *user)
 {
+	LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("%s: notify_cb: %p, data_cb: %p "
+         "data_cb_timestamp: %p, get_memory: %p, user :%p",__FUNCTION__,
+         notify_cb, data_cb, data_cb_timestamp, get_memory, user);
 
+   lcdev->notify_callback = notify_cb;
+   lcdev->data_callback = data_cb;
+   lcdev->data_timestamp_callback = data_cb_timestamp;
+   lcdev->request_memory = get_memory;
+   lcdev->user = user;
+
+   lcdev->hwif->setCallbacks(wrap_notify_callback, wrap_data_callback,wrap_data_callback_timestamp, (void *) lcdev);
 }
 
 void camera_enable_msg_type(struct camera_device * device, int32_t msg_type)
 {
-
+   LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("%s: msg_type:%d\n",__FUNCTION__,msg_type);
+   dump_msg(__FUNCTION__, msg_type);
+   lcdev->hwif->enableMsgType(msg_type);
 }
 
 void camera_disable_msg_type(struct camera_device * device, int32_t msg_type)
 {
-
+   LOG_FUNCTION_NAME
 }
 
 int camera_msg_type_enabled(struct camera_device * device, int32_t msg_type)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_start_preview(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 void camera_stop_preview(struct camera_device * device)
 {
-
+	LOG_FUNCTION_NAME
 }
 
 int camera_preview_enabled(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_store_meta_data_in_buffers(struct camera_device * device, int enable)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_start_recording(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 void camera_stop_recording(struct camera_device * device)
 {
-	
+	LOG_FUNCTION_NAME
 }
 
 int camera_recording_enabled(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 void camera_release_recording_frame(struct camera_device * device,
                                 const void *opaque)
 {
-
+	LOG_FUNCTION_NAME
 }
 
 int camera_auto_focus(struct camera_device * device)
@@ -172,52 +330,69 @@ int camera_auto_focus(struct camera_device * device)
 
 int camera_cancel_auto_focus(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_take_picture(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_cancel_picture(struct camera_device * device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_set_parameters(struct camera_device * device, const char *params)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 char* camera_get_parameters(struct camera_device * device)
 {
-	return NULL;
+   LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   char *rc = NULL;
+   android::CameraParameters params(lcdev->hwif->getParameters());
+   //CameraHAL_FixupParams(params);
+   rc = strdup((char *)params.flatten().string());
+   LOGV("%s: returning rc:%p :%s\n",__FUNCTION__,
+        rc, (rc != NULL) ? rc : "EMPTY STRING");
+   return rc;
 }
 
 void camera_put_parameters(struct camera_device *device, char *params)
 {
-
+   LOG_FUNCTION_NAME
+   LOGV("%s: params:%p %s",__FUNCTION__ , params, params);
+   free(params);
 }
 
 int camera_send_command(struct camera_device * device, int32_t cmd,
                         int32_t arg0, int32_t arg1)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 void camera_release(struct camera_device * device)
 {
-
+	LOG_FUNCTION_NAME
 }
 
 int camera_dump(struct camera_device * device, int fd)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
 int camera_device_close(hw_device_t* device)
 {
+	LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
