@@ -21,9 +21,22 @@
 #include <hardware/hardware.h>
 #include <hardware/camera.h>
 #include <binder/IMemory.h>
+#include <camera/CameraParameters.h>
 #include <fcntl.h>
 #include <linux/ioctl.h>
 #include <hardware/gralloc.h>
+
+using android::sp;
+using android::Overlay;
+using android::String8;
+using android::IMemory;
+using android::IMemoryHeap;
+using android::CameraParameters;
+using android::CameraInfo;
+using android::HAL_getCameraInfo;
+using android::HAL_getNumberOfCameras;
+using android::HAL_openCameraHardware;
+using android::CameraHardwareInterface;
 
 #define LOG_FUNCTION_NAME           LOGD("%d: %s() ENTER", __LINE__, __FUNCTION__);
 #define NO_ERROR 0
@@ -171,7 +184,7 @@ void wrap_data_callback(int32_t msg_type, const android::sp<android::IMemory>& d
       int32_t previewWidth, previewHeight;
       android::CameraParameters hwParameters(lcdev->hwif->getParameters());
       hwParameters.getPreviewSize(&previewWidth, &previewHeight);
-      LOGD("CameraHAL_DataCb: preview size = %dx%d\n", previewWidth, previewHeight);
+      LOGV("%s: preview size = %dx%d\n",__FUNCTION__, previewWidth, previewHeight);
       CameraHAL_HandlePreviewData(dataPtr, previewWidth, previewHeight, lcdev);
    }
 #else
@@ -205,6 +218,28 @@ void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
  * implementation of camera_device_ops_t functions
  *******************************************************************/
 
+ void camera_fixup_params(android::CameraParameters &camParams)
+{
+    const char *preferred_size = "640x480";
+    const char *preview_frame_rates  = "10,15,24,30";
+    const char *preferred_rate = "30";
+
+    camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
+                  android::CameraParameters::PIXEL_FORMAT_YUV420SP);
+
+    camParams.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
+                  preferred_size);
+
+    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES)) {
+        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES,
+                      preview_frame_rates);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_PREVIEW_FRAME_RATE)) {
+        camParams.set(CameraParameters::KEY_PREVIEW_FRAME_RATE, preferred_rate);
+    }
+}
+
 int camera_get_camera_info(int camera_id, struct camera_info *info)
 {
 	LOG_FUNCTION_NAME
@@ -230,7 +265,80 @@ int camera_set_preview_window(struct camera_device * device,
                            struct preview_stream_ops *window)
 {
    LOG_FUNCTION_NAME
-   	return NO_ERROR;
+   	int rv = -EINVAL;
+   int min_bufs = -1;
+   int kBufferCount = 4;
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+
+   LOGV("%s : Window :%p\n",__FUNCTION__, window);
+   if (device == NULL) {
+      LOGE("camera_set_preview_window : Invalid device.\n");
+      return -EINVAL;
+   }
+
+   if (lcdev->window == window) {
+      return 0;
+   }
+
+   lcdev->window = window;
+
+   if (!window) {
+      LOGD("%s: window is NULL", __FUNCTION__);
+      return -EINVAL;
+   }
+
+   LOGV("%s : OK window is %p", __FUNCTION__, window);
+
+   if (!lcdev->gralloc) {
+      hw_module_t const* module;
+      int err = 0;
+      if (hw_get_module(GRALLOC_HARDWARE_MODULE_ID, &module) == 0) {
+         lcdev->gralloc = (const gralloc_module_t *)module;
+      } else {
+         LOGE("%s: Fail on loading gralloc HAL", __FUNCTION__);
+      }
+   }
+
+
+   LOGV("%s: OK on loading gralloc HAL", __FUNCTION__);
+   if (window->get_min_undequeued_buffer_count(window, &min_bufs)) {
+      LOGE("%s: could not retrieve min undequeued buffer count", __FUNCTION__);
+      return -1;
+   }
+   LOGV("%s: OK get_min_undequeued_buffer_count", __FUNCTION__);
+
+   LOGV("%s: bufs:%i", __FUNCTION__, min_bufs);
+   if (min_bufs >= kBufferCount) {
+      LOGE("%s: min undequeued buffer count %i is too high (expecting at most %i)",
+          __FUNCTION__, min_bufs, kBufferCount - 1);
+   }
+
+   LOGV("%s: setting buffer count to %i", __FUNCTION__, kBufferCount);
+   if (window->set_buffer_count(window, kBufferCount)) {
+      LOGE("%s: could not set buffer count", __FUNCTION__);
+      return -1;
+   }
+
+   int w, h;
+   android::CameraParameters params(lcdev->hwif->getParameters());
+   params.getPreviewSize(&w, &h);
+   int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
+
+   const char *str_preview_format = params.getPreviewFormat();
+   LOGV("%s: preview format %s", __FUNCTION__, str_preview_format);
+
+   if (window->set_usage(window, GRALLOC_USAGE_SW_WRITE_MASK)) {
+      LOGE("%s: could not set usage on gralloc buffer", __FUNCTION__);
+      return -1;
+   }
+
+   if (window->set_buffers_geometry(window, w, h, hal_pixel_format)) {
+      LOGE("%s: could not set buffers geometry to %s",
+          __FUNCTION__, str_preview_format);
+      return -1;
+   }
+
+   return NO_ERROR;
 }
 
 
@@ -269,29 +377,47 @@ void camera_enable_msg_type(struct camera_device * device, int32_t msg_type)
 void camera_disable_msg_type(struct camera_device * device, int32_t msg_type)
 {
    LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("camera_disable_msg_type: msg_type:%d\n", msg_type);
+   dump_msg(__FUNCTION__, msg_type);
+   lcdev->hwif->disableMsgType(msg_type);
 }
 
 int camera_msg_type_enabled(struct camera_device * device, int32_t msg_type)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("camera_msg_type_enabled: msg_type:%d\n", msg_type);
+   dump_msg(__FUNCTION__, msg_type);
+   return lcdev->hwif->msgTypeEnabled(msg_type);
 }
 
 int camera_start_preview(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("camera_start_preview: Enabling CAMERA_MSG_PREVIEW_FRAME\n");
+   lcdev->hwif->enableMsgType(CAMERA_MSG_PREVIEW_FRAME);
+   return lcdev->hwif->startPreview();
 }
 
 void camera_stop_preview(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   LOGV("camera_stop_preview:\n");
+   lcdev->hwif->disableMsgType(CAMERA_MSG_PREVIEW_FRAME);
+   lcdev->hwif->stopPreview();
+   return;
 }
 
 int camera_preview_enabled(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   int ret = lcdev->hwif->previewEnabled();
+   LOGV("%s: %d\n",__FUNCTION__,ret);
+   return ret;
 }
 
 int camera_store_meta_data_in_buffers(struct camera_device * device, int enable)
@@ -358,7 +484,7 @@ char* camera_get_parameters(struct camera_device * device)
    struct legacy_camera_device *lcdev = to_lcdev(device);
    char *rc = NULL;
    android::CameraParameters params(lcdev->hwif->getParameters());
-   //CameraHAL_FixupParams(params);
+   //camera_fixup_params(params);
    rc = strdup((char *)params.flatten().string());
    LOGV("%s: returning rc:%p :%s\n",__FUNCTION__,
         rc, (rc != NULL) ? rc : "EMPTY STRING");
