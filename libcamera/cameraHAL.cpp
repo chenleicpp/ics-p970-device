@@ -130,15 +130,9 @@ camera_memory_t * wrap_memory_data(const android::sp<android::IMemory> &dataPtr,
    struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
    android::sp<android::IMemoryHeap> mHeap = dataPtr->getMemory(&offset, &size);
 
-   //LOGV("CameraHAL_GenClientData: offset:%#x size:%#x base:%p\n",
-   //     (unsigned)offset, size, mHeap != NULL ? mHeap->base() : 0);
-
-   //LOGV("%s: #1", __FUNCTION__);
    clientData = lcdev->request_memory(-1, size, 1, lcdev->user);
-   //LOGV("%s: #2", __FUNCTION__);
    if (clientData != NULL) {
       memcpy(clientData->data, (char *)(mHeap->base()) + offset, size);
-   //LOGV("%s: #3", __FUNCTION__);
    } else {
       LOGE("wrap_memory_data: ERROR allocating memory from client\n");
    }
@@ -220,24 +214,23 @@ void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
 
  void camera_fixup_params(android::CameraParameters &camParams)
 {
-    const char *preferred_size = "640x480";
-    const char *preview_frame_rates  = "10,15,24,30";
-    const char *preferred_rate = "30";
-
-    camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
+   const char *preferred_size = "640x480";
+  
+   if (!camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT))
+   {
+      LOGE("%s:parame1:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT));
+      camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
                   android::CameraParameters::PIXEL_FORMAT_YUV420SP);
-
-    camParams.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
+      LOGE("%s:parame1:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT));
+   }
+    
+   if (!camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO))
+   {
+      LOGE("%s:parame2:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO));
+      camParams.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
                   preferred_size);
-
-    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES)) {
-        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES,
-                      preview_frame_rates);
-    }
-
-    if (!camParams.get(android::CameraParameters::KEY_PREVIEW_FRAME_RATE)) {
-        camParams.set(CameraParameters::KEY_PREVIEW_FRAME_RATE, preferred_rate);
-    }
+      LOGE("%s:parame2:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO));
+   }
 }
 
 int camera_get_camera_info(int camera_id, struct camera_info *info)
@@ -323,7 +316,6 @@ int camera_set_preview_window(struct camera_device * device,
    android::CameraParameters params(lcdev->hwif->getParameters());
    params.getPreviewSize(&w, &h);
    int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
-
    const char *str_preview_format = params.getPreviewFormat();
    LOGV("%s: preview format %s", __FUNCTION__, str_preview_format);
 
@@ -484,7 +476,7 @@ char* camera_get_parameters(struct camera_device * device)
    struct legacy_camera_device *lcdev = to_lcdev(device);
    char *rc = NULL;
    android::CameraParameters params(lcdev->hwif->getParameters());
-   //camera_fixup_params(params);
+   camera_fixup_params(params);
    rc = strdup((char *)params.flatten().string());
    LOGV("%s: returning rc:%p :%s\n",__FUNCTION__,
         rc, (rc != NULL) ? rc : "EMPTY STRING");
