@@ -421,18 +421,25 @@ int camera_store_meta_data_in_buffers(struct camera_device * device, int enable)
 int camera_start_recording(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+    struct legacy_camera_device *lcdev = to_lcdev(device);
+    lcdev->hwif->enableMsgType(CAMERA_MSG_VIDEO_FRAME);
+    lcdev->hwif->startRecording();
+    return NO_ERROR;
 }
 
 void camera_stop_recording(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
+    struct legacy_camera_device *lcdev = to_lcdev(device);
+    lcdev->hwif->disableMsgType(CAMERA_MSG_VIDEO_FRAME);
+    lcdev->hwif->stopRecording();
 }
 
 int camera_recording_enabled(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+	struct legacy_camera_device *lcdev = to_lcdev(device);
+    return (int)lcdev->hwif->recordingEnabled();
 }
 
 void camera_release_recording_frame(struct camera_device * device,
