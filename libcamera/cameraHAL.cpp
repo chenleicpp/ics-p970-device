@@ -448,7 +448,7 @@ int camera_auto_focus(struct camera_device * device)
 
 int camera_cancel_auto_focus(struct camera_device * device)
 {
-	LOG_FUNCTION_NAME
+    LOG_FUNCTION_NAME
 	return NO_ERROR;
 }
 
@@ -466,8 +466,11 @@ int camera_cancel_picture(struct camera_device * device)
 
 int camera_set_parameters(struct camera_device * device, const char *params)
 {
-	LOG_FUNCTION_NAME
-	return NO_ERROR;
+  LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  android::String8 s(params);
+  android::CameraParameters p(s);
+  return NO_ERROR;
 }
 
 char* camera_get_parameters(struct camera_device * device)
@@ -493,25 +496,48 @@ void camera_put_parameters(struct camera_device *device, char *params)
 int camera_send_command(struct camera_device * device, int32_t cmd,
                         int32_t arg0, int32_t arg1)
 {
-	LOG_FUNCTION_NAME
-	return NO_ERROR;
+  LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  LOGV("camera_send_command: cmd:%d arg0:%d arg1:%d\n",
+        cmd, arg0, arg1);
+  return lcdev->hwif->sendCommand(cmd, arg0, arg1);
 }
 
 void camera_release(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  lcdev->hwif->release();
 }
 
 int camera_dump(struct camera_device * device, int fd)
 {
-	LOG_FUNCTION_NAME
-	return NO_ERROR;
+  LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  android::Vector<android::String16> args;
+  return lcdev->hwif->dump(fd, args);
 }
 
 int camera_device_close(hw_device_t* device)
 {
-	LOG_FUNCTION_NAME
-	return NO_ERROR;
+  LOG_FUNCTION_NAME
+  struct camera_device * hwdev = reinterpret_cast<struct camera_device *>(device);
+  struct legacy_camera_device *lcdev = to_lcdev(hwdev);
+  int rc = -EINVAL;
+  LOGE("camera_device_close\n");
+  if (lcdev != NULL) {
+    camera_device_ops_t *camera_ops = lcdev->device.ops;
+    if (camera_ops) {
+        if (lcdev->hwif != NULL) {
+          lcdev->hwif.clear();
+        }
+        free(camera_ops);
+    }
+    free(lcdev);
+    rc = NO_ERROR;
+  }
+  return rc;
+
 }
 
 int camera_device_open(const hw_module_t* module, const char* name,
