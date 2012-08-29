@@ -479,7 +479,7 @@ char* camera_get_parameters(struct camera_device * device)
    struct legacy_camera_device *lcdev = to_lcdev(device);
    char *rc = NULL;
    android::CameraParameters params(lcdev->hwif->getParameters());
-   camera_fixup_params(params);
+   //camera_fixup_params(params);
    rc = strdup((char *)params.flatten().string());
    LOGV("%s: returning rc:%p :%s\n",__FUNCTION__,
         rc, (rc != NULL) ? rc : "EMPTY STRING");
@@ -524,14 +524,12 @@ int camera_device_close(hw_device_t* device)
   struct camera_device * hwdev = reinterpret_cast<struct camera_device *>(device);
   struct legacy_camera_device *lcdev = to_lcdev(hwdev);
   int rc = -EINVAL;
-  LOGE("camera_device_close\n");
+  LOGV("camera_device_close\n");
   if (lcdev != NULL) {
     camera_device_ops_t *camera_ops = lcdev->device.ops;
     if (camera_ops) {
-        if (lcdev->hwif != NULL) {
-          lcdev->hwif.clear();
-        }
         free(camera_ops);
+        camera_ops = NULL;
     }
     free(lcdev);
     rc = NO_ERROR;
