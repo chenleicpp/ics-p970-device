@@ -443,25 +443,34 @@ void camera_release_recording_frame(struct camera_device * device,
 
 int camera_auto_focus(struct camera_device * device)
 {
+  LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  lcdev->hwif->autoFocus();
 	return NO_ERROR;
 }
 
 int camera_cancel_auto_focus(struct camera_device * device)
 {
-    LOG_FUNCTION_NAME
-	return NO_ERROR;
+  LOG_FUNCTION_NAME
+  struct legacy_camera_device *lcdev = to_lcdev(device);
+  lcdev->hwif->cancelAutoFocus();
+  return NO_ERROR;
 }
 
 int camera_take_picture(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+	struct legacy_camera_device *lcdev = to_lcdev(device);
+   lcdev->hwif->takePicture();
+   return NO_ERROR;
 }
 
 int camera_cancel_picture(struct camera_device * device)
 {
 	LOG_FUNCTION_NAME
-	return NO_ERROR;
+   struct legacy_camera_device *lcdev = to_lcdev(device);
+   lcdev->hwif->cancelPicture();
+   return NO_ERROR; 
 }
 
 int camera_set_parameters(struct camera_device * device, const char *params)
