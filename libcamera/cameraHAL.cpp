@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <linux/ioctl.h>
 #include <hardware/gralloc.h>
+#include <camera/Overlay.h>
 
 using android::sp;
 using android::Overlay;
@@ -50,6 +51,32 @@ int camera_device_open(const hw_module_t* module, const char* name,
 int camera_get_camera_info(int camera_id, struct camera_info *info);
 int camera_get_number_of_cameras(void);
 
+static hw_module_methods_t camera_module_methods = {
+    open: camera_device_open
+};
+
+camera_module_t HAL_MODULE_INFO_SYM = {
+    common: {
+        tag: HARDWARE_MODULE_TAG,
+        version_major: 1,
+        version_minor: 0,
+        id: CAMERA_HARDWARE_MODULE_ID,
+        name: "Camera HAL for P970 ICS",
+        author: "ChenLei",
+        methods: &camera_module_methods,
+        dso: NULL,
+        reserved: {0},
+   },
+    get_number_of_cameras: camera_get_number_of_cameras,
+    get_camera_info: camera_get_camera_info,
+};
+
+static inline struct legacy_camera_device * to_lcdev(struct camera_device *dev)
+{
+    return reinterpret_cast<struct legacy_camera_device *>(dev);
+}
+
+
 struct legacy_camera_device {
    camera_device_t device;
    android::sp<android::CameraHardwareInterface> hwif;
@@ -64,6 +91,8 @@ struct legacy_camera_device {
    preview_stream_ops *window;
    gralloc_module_t const *gralloc;
    camera_memory_t *clientData;
+
+   sp<Overlay> overlay;
 };
 
 static struct {
@@ -95,30 +124,13 @@ static void dump_msg(const char *tag, int msg_type)
     }
 }
 
-static hw_module_methods_t camera_module_methods = {
-    open: camera_device_open
-};
-
-camera_module_t HAL_MODULE_INFO_SYM = {
-    common: {
-        tag: HARDWARE_MODULE_TAG,
-        version_major: 1,
-        version_minor: 0,
-        id: CAMERA_HARDWARE_MODULE_ID,
-        name: "Camera HAL for P970 ICS",
-        author: "ChenLei",
-        methods: &camera_module_methods,
-        dso: NULL,
-        reserved: {0},
-   },
-    get_number_of_cameras: camera_get_number_of_cameras,
-    get_camera_info: camera_get_camera_info,
-};
-
-static inline struct legacy_camera_device * to_lcdev(struct camera_device *dev)
-{
-    return reinterpret_cast<struct legacy_camera_device *>(dev);
+static void overlayQueueBuffer(void *data, void *buffer, size_t size) {
+    
 }
+
+/*******************************************************************
+ * camera interface callback
+ *******************************************************************/
 
 camera_memory_t * wrap_memory_data(const android::sp<android::IMemory> &dataPtr,
                         void *user)
@@ -169,20 +181,9 @@ void wrap_data_callback(int32_t msg_type, const android::sp<android::IMemory>& d
         }
         lcdev->clientData = wrap_memory_data(dataPtr, lcdev);
         if (lcdev->clientData != NULL) {
-         //LOGV("CameraHAL_DataCb: Posting data to client\n");
             lcdev->data_callback(msg_type, lcdev->clientData, 0, NULL, lcdev->user);
         }
    }
-#if 0
-   if (msg_type == CAMERA_MSG_PREVIEW_FRAME) {
-      int32_t previewWidth, previewHeight;
-      android::CameraParameters hwParameters(lcdev->hwif->getParameters());
-      hwParameters.getPreviewSize(&previewWidth, &previewHeight);
-      LOGV("%s: preview size = %dx%d\n",__FUNCTION__, previewWidth, previewHeight);
-      CameraHAL_HandlePreviewData(dataPtr, previewWidth, previewHeight, lcdev);
-   }
-#else
-#endif
 }
 
 void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
@@ -212,24 +213,53 @@ void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
  * implementation of camera_device_ops_t functions
  *******************************************************************/
 
- void camera_fixup_params(android::CameraParameters &camParams)
+void camera_fixup_params(android::CameraParameters &camParams)
 {
-    const char *preferred_size = "640x480";
-  
-    if (!camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT))
-    {    
-        LOGE("%s:parame1:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT));
-        camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
-                  android::CameraParameters::PIXEL_FORMAT_YUV420SP);
-        LOGE("%s:parame1:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT));
-   }
-    
-    if (!camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO))
-    {
-        LOGE("%s:parame2:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO));
-        camParams.set(CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
-                  preferred_size);
-        LOGE("%s:parame2:%s",__FUNCTION__,camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO));
+    const char *preview_sizes =
+      "1280x720,800x480,768x432,720x480,640x480,576x432,480x320,384x288,352x288,320x240,240x160,176x144";
+    const char *video_sizes = 
+      "1280x720,800x480,720x480,640x480,352x288,320x240,176x144";
+    const char *preferred_size       = "640x480";
+    const char *preview_frame_rates  = "30,27,24,15";
+    const char *preferred_frame_rate = "15";
+    const char *frame_rate_range     = "(15,30)";
+
+    camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT,
+                android::CameraParameters::PIXEL_FORMAT_YUV420SP);
+
+    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES)) {
+        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_SIZES,
+                   preview_sizes);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES)) {
+        camParams.set(android::CameraParameters::KEY_SUPPORTED_VIDEO_SIZES,
+                   video_sizes);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_VIDEO_SIZE)) {
+        camParams.set(android::CameraParameters::KEY_VIDEO_SIZE, preferred_size);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO)) {
+        camParams.set(android::CameraParameters::KEY_PREFERRED_PREVIEW_SIZE_FOR_VIDEO,
+                   preferred_size);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES)) {
+        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES,
+                   preview_frame_rates);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_PREVIEW_FRAME_RATE)) {
+        camParams.set(android::CameraParameters::KEY_PREVIEW_FRAME_RATE,
+                   preferred_frame_rate);
+    }
+
+    if (!camParams.get(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE)) {
+        LOGD("Setting KEY_PREVIEW_FPS_RANGE: %s\n", frame_rate_range);
+        camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,
+                   frame_rate_range);
     }
 }
 
@@ -260,7 +290,7 @@ int camera_set_preview_window(struct camera_device * device,
     LOG_FUNCTION_NAME
    	int rv = -EINVAL;
     int min_bufs = -1;
-    int kBufferCount = 4;
+    int kBufferCount = 6;
     struct legacy_camera_device *lcdev = to_lcdev(device);
 
     LOGV("%s : Window :%p\n",__FUNCTION__, window);
@@ -315,11 +345,11 @@ int camera_set_preview_window(struct camera_device * device,
     int w, h;
     android::CameraParameters params(lcdev->hwif->getParameters());
     params.getPreviewSize(&w, &h);
-    int hal_pixel_format = HAL_PIXEL_FORMAT_YCrCb_420_SP;
+    int hal_pixel_format = HAL_PIXEL_FORMAT_YV12;
     const char *str_preview_format = params.getPreviewFormat();
     LOGV("%s: preview format %s", __FUNCTION__, str_preview_format);
 
-    if (window->set_usage(window, GRALLOC_USAGE_SW_WRITE_MASK)) {
+    if (window->set_usage(window, GRALLOC_USAGE_SW_WRITE_OFTEN)) {
         LOGE("%s: could not set usage on gralloc buffer", __FUNCTION__);
         return -1;
     }
@@ -328,6 +358,13 @@ int camera_set_preview_window(struct camera_device * device,
         LOGE("%s: could not set buffers geometry to %s",
           __FUNCTION__, str_preview_format);
       return -1;
+    }
+
+    if (lcdev->hwif->useOverlay()) {
+        LOGI("%s: Using overlay for device %p", __FUNCTION__, lcdev);
+        lcdev->overlay = new Overlay(w, h,
+                Overlay::FORMAT_YUV422I, overlayQueueBuffer, (void*) lcdev);
+        lcdev->hwif->setOverlay(lcdev->overlay);
     }
 
     return NO_ERROR;
@@ -389,7 +426,6 @@ int camera_start_preview(struct camera_device * device)
 	LOG_FUNCTION_NAME
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("camera_start_preview: Enabling CAMERA_MSG_PREVIEW_FRAME\n");
-    lcdev->hwif->enableMsgType(CAMERA_MSG_PREVIEW_FRAME);
     return lcdev->hwif->startPreview();
 }
 
@@ -398,7 +434,6 @@ void camera_stop_preview(struct camera_device * device)
 	LOG_FUNCTION_NAME
     struct legacy_camera_device *lcdev = to_lcdev(device);
     LOGV("camera_stop_preview:\n");
-    lcdev->hwif->disableMsgType(CAMERA_MSG_PREVIEW_FRAME);
     lcdev->hwif->stopPreview();
     return;
 }
