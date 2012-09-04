@@ -96,6 +96,8 @@ struct legacy_camera_device {
     
     int32_t                        previewWidth;
     int32_t                        previewHeight;
+    
+    Overlay::Format                previewFormat;
 };
 
 static struct {
@@ -296,6 +298,15 @@ void wrap_data_callback(int32_t msg_type, const android::sp<android::IMemory>& d
             lcdev->data_callback(msg_type, lcdev->clientData, 0, NULL, lcdev->user);
         }
    }
+
+    if (msg_type == CAMERA_MSG_PREVIEW_FRAME && lcdev->overlay == NULL) {
+        ssize_t offset;
+        size_t  size;
+        sp<IMemoryHeap> mHeap = dataPtr->getMemory(&offset, &size);
+        char* buffer = (char*) mHeap->getBase() + offset;
+        LOGV("%s: preview size = %dx%d\n",__FUNCTION__, lcdev->previewWidth, lcdev->previewHeight);
+        processPreviewData(buffer, size, lcdev, lcdev->previewFormat);
+    }
 }
 
 void wrap_data_callback_timestamp(nsecs_t timestamp, int32_t msg_type,
@@ -432,7 +443,7 @@ int camera_set_preview_window(struct camera_device * device,
     int hal_pixel_format = HAL_PIXEL_FORMAT_YV12;
     const char *str_preview_format = params.getPreviewFormat();
     LOGV("%s: preview format %s", __FUNCTION__, str_preview_format);
-
+    lcdev->previewFormat = Overlay::getFormatFromString(str_preview_format);
     if (window->set_usage(window, GRALLOC_USAGE_SW_WRITE_OFTEN)) {
         LOGE("%s: could not set usage on gralloc buffer", __FUNCTION__);
         return -1;
@@ -605,6 +616,7 @@ int camera_set_parameters(struct camera_device * device, const char *params)
     struct legacy_camera_device *lcdev = to_lcdev(device);
     android::String8 s(params);
     android::CameraParameters p(s);
+    lcdev->hwif->setParameters(p);
     return NO_ERROR;
 }
 
