@@ -347,10 +347,24 @@ inline void destroyOverlay(legacy_camera_device *lcdev)
 
 void camera_fixup_params(android::CameraParameters &camParams)
 {
+//this is for test compare from cm7 camera setting params
     const char *preview_size = "640x480";
-    camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT, CameraParameters::PIXEL_FORMAT_YUV422I);
-    camParams.setPreviewFormat(android::CameraParameters::PIXEL_FORMAT_YUV422I);
+    const char *picture_size_values = "2592x1944,2048x1536,1600x1200,1280x960,1280x720,640x480,512x384,320x240";
+    //const char *picture_size = "2592x1944";
+    //const char *preview_fps_range_values = "(10000,10000),(15000,15000),(24000,24000),(30000,30000),(8000,33000)";
+    //const char *preview_fps_range = "30000,30000";
+    const char *preview_frame_rate_values = "10,15,24,30";
+    const char *preview_frame_rate = "30";
+    //camParams.set(android::CameraParameters::KEY_VIDEO_FRAME_FORMAT, CameraParameters::PIXEL_FORMAT_YUV422I);
+    //camParams.setPreviewFormat(android::CameraParameters::PIXEL_FORMAT_YUV422I);
     camParams.set(android::CameraParameters::KEY_PREVIEW_SIZE,preview_size);   
+    camParams.set(android::CameraParameters::KEY_SUPPORTED_PICTURE_SIZES,picture_size_values);
+    //camParams.set(android::CameraParameters::KEY_PICTURE_SIZE,picture_size);
+    //camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE,preview_fps_range_values);
+    //camParams.set(android::CameraParameters::KEY_PREVIEW_FPS_RANGE,preview_fps_range);
+    camParams.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES,preview_frame_rate_values);
+    camParams.set(android::CameraParameters::KEY_PREVIEW_FRAME_RATE,preview_frame_rate);
+    
 }
 
 int camera_get_camera_info(int camera_id, struct camera_info *info)
