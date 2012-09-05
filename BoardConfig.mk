@@ -1,4 +1,3 @@
-USE_CAMERA_STUB := false
 
 # inherit from the proprietary version
 -include vendor/lge/p970/BoardConfigVendor.mk
@@ -48,8 +47,8 @@ BOARD_USES_AUDIO_LEGACY := true
 TARGET_PROVIDES_LIBAUDIO := false
 
 # Camera
-BOARD_CAMERA_LIBRARIES := libcamera
-BOARD_OVERLAY_BASED_CAMERA_HAL := true
+#BOARD_CAMERA_LIBRARIES := libcamera
+#BOARD_OVERLAY_BASED_CAMERA_HAL := true
 
 HARDWARE_OMX := true
 ifdef HARDWARE_OMX

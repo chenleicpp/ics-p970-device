@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2010, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +22,6 @@
 #include <surfaceflinger/ISurface.h>
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
-#include <camera/Overlay.h>
 
 namespace android {
 
@@ -143,6 +141,10 @@ public:
      * Returns true if preview is enabled.
      */
     virtual bool        previewEnabled() = 0;
+
+    /* NVidia extensions, needed for the star's libcamera */
+    virtual status_t    storeMetaDataInBuffers(bool enable) { return enable? INVALID_OPERATION: OK; }
+    virtual status_t    isMetaDataStoredInVideoBuffers() { return false; }
 
     /**
      * Start record mode. When a record image is available a CAMERA_MSG_VIDEO_FRAME
