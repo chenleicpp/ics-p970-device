@@ -242,15 +242,15 @@ CameraHAL_GenClientData(const android::sp<android::IMemory> &dataPtr,
    struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
    android::sp<android::IMemoryHeap> mHeap = dataPtr->getMemory(&offset, &size);
 
-   //LOGV("CameraHAL_GenClientData: offset:%#x size:%#x base:%p\n",
-   //     (unsigned)offset, size, mHeap != NULL ? mHeap->base() : 0);
+   LOGV("CameraHAL_GenClientData: offset:%#x size:%#x base:%p\n",
+        (unsigned)offset, size, mHeap != NULL ? mHeap->base() : 0);
 
-   //LOGV("%s: #1", __FUNCTION__);
+   LOGV("%s: #1", __FUNCTION__);
    clientData = lcdev->request_memory(-1, size, 1, lcdev->user);
-   //LOGV("%s: #2", __FUNCTION__);
+   LOGV("%s: #2", __FUNCTION__);
    if (clientData != NULL) {
       memcpy(clientData->data, (char *)(mHeap->base()) + offset, size);
-   //LOGV("%s: #3", __FUNCTION__);
+   LOGV("%s: #3", __FUNCTION__);
    } else {
       LOGV("CameraHAL_GenClientData: ERROR allocating memory from client\n");
    }
@@ -263,7 +263,7 @@ CameraHAL_DataCb(int32_t msg_type, const android::sp<android::IMemory>& dataPtr,
 {
    struct legacy_camera_device *lcdev = (struct legacy_camera_device *) user;
 
-   //LOGV("CameraHAL_DataCb: msg_type:%d user:%p\n", msg_type, user);
+   LOGV("CameraHAL_DataCb: msg_type:%d user:%p\n", msg_type, user);
    //
    if (lcdev->data_callback != NULL && lcdev->request_memory != NULL) {
       /* Make sure any pre-existing heap is released */
@@ -282,7 +282,7 @@ CameraHAL_DataCb(int32_t msg_type, const android::sp<android::IMemory>& dataPtr,
       int32_t previewWidth, previewHeight;
       android::CameraParameters hwParameters(lcdev->hwif->getParameters());
       hwParameters.getPreviewSize(&previewWidth, &previewHeight);
-      //LOGV("CameraHAL_DataCb: preview size = %dx%d\n", previewWidth, previewHeight);
+      LOGV("CameraHAL_DataCb: preview size = %dx%d\n", previewWidth, previewHeight);
       CameraHAL_HandlePreviewData(dataPtr, previewWidth, previewHeight, lcdev);
    }
 
