@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2010, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,12 +46,19 @@ typedef void (*notify_callback)(int32_t msgType,
 typedef void (*data_callback)(int32_t msgType,
                               const sp<IMemory>& dataPtr,
                               void* user);
-
+#ifdef OMAP_ENHANCEMENT
+typedef void (*data_callback_timestamp)(nsecs_t timestamp,
+                                        int32_t msgType,
+                                        const sp<IMemory>& dataPtr,
+                                        void* user,
+                                        uint32_t offset,
+                                        uint32_t stride);
+#else
 typedef void (*data_callback_timestamp)(nsecs_t timestamp,
                                         int32_t msgType,
                                         const sp<IMemory>& dataPtr,
                                         void* user);
-
+#endif
 /**
  * CameraHardwareInterface.h defines the interface to the
  * camera hardware abstraction layer, used for setting and getting
@@ -126,6 +134,21 @@ public:
      */
     virtual status_t    startPreview() = 0;
 
+#ifdef USE_GETBUFFERINFO
+    /**
+     * Query the recording buffer information from HAL.
+     * This is needed because the opencore expects the buffer
+     * information before starting the recording.
+     */
+    virtual status_t    getBufferInfo(sp<IMemory>& Frame, size_t *alignedSize) = 0;
+#endif
+#ifdef CAF_CAMERA_GB_REL
+    /**
+     * Encode the YUV data.
+     */
+    virtual void        encodeData() = 0;
+#endif
+
     /**
      * Only used if overlays are used for camera preview.
      */
@@ -141,10 +164,6 @@ public:
      * Returns true if preview is enabled.
      */
     virtual bool        previewEnabled() = 0;
-
-    /* NVidia extensions, needed for the star's libcamera */
-    virtual status_t    storeMetaDataInBuffers(bool enable) { return enable? INVALID_OPERATION: OK; }
-    virtual status_t    isMetaDataStoredInVideoBuffers() { return false; }
 
     /**
      * Start record mode. When a record image is available a CAMERA_MSG_VIDEO_FRAME
