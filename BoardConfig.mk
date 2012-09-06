@@ -1,5 +1,3 @@
-COMMON_GLOBAL_CFLAGS += -DBINDER_COMPAT
-
 # inherit from the proprietary version
 -include vendor/lge/p970/BoardConfigVendor.mk
 
@@ -50,8 +48,10 @@ BOARD_USES_AUDIO_LEGACY := true
 TARGET_PROVIDES_LIBAUDIO := false
 
 # Camera
-#BOARD_CAMERA_LIBRARIES := libcamera
-#BOARD_OVERLAY_BASED_CAMERA_HAL := true
+# include GB overlay for GB overlay based libcamera
+BOARD_USES_GINGERBREAD_OVERLAY := true
+# use GB compatible binder for GB overlay based libcamera
+COMMON_GLOBAL_CFLAGS += -DBINDER_COMPAT
 
 HARDWARE_OMX := true
 ifdef HARDWARE_OMX
