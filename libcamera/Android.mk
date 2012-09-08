@@ -6,6 +6,7 @@ LOCAL_MODULE_TAGS    := optional
 LOCAL_MODULE_PATH    := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_MODULE         := camera.$(TARGET_BOOTLOADER_BOARD_NAME)
 LOCAL_SRC_FILES      := cameraHAL.cpp
+LOCAL_C_INCLUDES := $(TOP)/frameworks/base/include
 LOCAL_PRELINK_MODULE := false
 
 LOCAL_SHARED_LIBRARIES += \
@@ -17,6 +18,7 @@ LOCAL_SHARED_LIBRARIES += \
     libhardware \
     libcamera_client \
     libcamera \
+    libui
 
 LOCAL_SHARED_LIBRARIES += libdl
 
