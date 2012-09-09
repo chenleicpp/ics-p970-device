@@ -3,11 +3,11 @@ include $(all-subdir-makefiles)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES:= \
-	CameraHal_Module.cpp \
+    CameraHal_Module.cpp \
     V4L2Camera.cpp \
     CameraHardware.cpp \
     converter.cpp \
-	ExifCreator.cpp \
+    ExifCreator.cpp \
 
 LOCAL_C_INCLUDES += \
     $(LOCAL_PATH)/../include/ \

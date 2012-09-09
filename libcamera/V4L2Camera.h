@@ -46,59 +46,58 @@
 
 namespace android {
 
-	struct vdIn {
-		struct v4l2_capability cap;
-		struct v4l2_format format;
-		struct v4l2_buffer buf;
-		struct v4l2_requestbuffers rb;
-		void *mem[NB_BUFFER];
-		bool isStreaming;
-		int width;
-		int height;
-		int formatIn;
-		int framesizeIn;
+struct vdIn {
+    struct v4l2_capability cap;
+    struct v4l2_format format;
+    struct v4l2_buffer buf;
+    struct v4l2_requestbuffers rb;
+    void *mem[NB_BUFFER];
+    bool isStreaming;
+    int width;
+    int height;
+    int formatIn;
+    int framesizeIn;
 #ifdef _OMAP_RESIZER_
-		int resizeHandle;
-#endif				//_OMAP_RESIZER_
-	};
-	struct mdIn {
-		int media_fd;
-		int input_source;
-		struct media_entity_desc entity[20];
-		int video;
-		int ccdc;
-		int tvp5146;
-		int mt9t111;
-		int mt9v113;
-		unsigned int num_entities;
-	};
+	int resizeHandle;
+#endif //_OMAP_RESIZER_
+};
+struct mdIn {
+	int media_fd;
+	int input_source;
+	struct media_entity_desc entity[20];
+	int video;
+	int ccdc;
+	int tvp5146;
+	int mt9t111;
+	int mt9v113;
+	unsigned int num_entities;
+};
 
-	class V4L2Camera {
+class V4L2Camera {
 
-	      public:
+	public:
 		V4L2Camera();
 		~V4L2Camera();
 
-		int Open(const char *device);
-		int Configure(int width, int height, int pixelformat, int fps,
-			      int cam_mode);
-		void Close();
+		int Open (const char *device);
+		int Configure(int width,int height,int pixelformat,int fps,int cam_mode);
+		void Close ();
 		void reset_links(const char *device);
 		int Open_media_device(const char *device);
 
-		int BufferMap(int cam_mode);
+		int BufferMap (int cam_mode);
 		int init_parm();
-		void Uninit(int cam_mode);
+		void Uninit (int cam_mode);
 
-		int StartStreaming();
-		int StopStreaming();
+		int StartStreaming ();
+		int StopStreaming ();
 
 		int setAutofocus();
 		int getAutoFocusResult();
 		int cancelAutofocus();
 		int setZoom(int zoom_level);
 		int setWhiteBalance(int white_balance);
-		int setFramerate(int framerate, int cam_mode);
+		int setFramerate(int framerate,int cam_mode);
 		int setBrightness(int brightness);
 		int getBrightness(void);
 		int setSceneMode(int scene_mode);
@@ -115,7 +114,7 @@ namespace android {
 		int GetJPEG_Capture_Width();
 		int GetJPEG_Capture_Height();
 		int GetCamera_version();
-		void getExifInfoFromDriver(v4l2_exif * exifobj);
+		void getExifInfoFromDriver(v4l2_exif* exifobj);
 		int getWhiteBalance();
 		int setMetering(int metering_value);
 		int setISO(int iso_value);
@@ -128,28 +127,21 @@ namespace android {
 		int setSaturation(int saturation_value);
 		int getSaturation(void);
 
-		void *GrabPreviewFrame();
-		void *GrabRecordFrame(int &index);
-		void ReleaseRecordFrame(int index);
-		void GrabRawFrame(void *previewBuffer, unsigned int width,
-				  unsigned int height);
-		camera_memory_t *GrabJpegFrame(camera_request_memory
-					       mRequestMemory,
-					       unsigned long &mfilesize,
-					       bool IsFrontCam);
-		camera_memory_t *CreateJpegFromBuffer(void *rawBuffer,
-						      camera_request_memory
-						      mRequestMemory);
-		unsigned long savePicture(unsigned char *inputBuffer,
-					  unsigned char *&output);
-		void convert(unsigned char *buf, unsigned char *rgb, int width,
-			     int height);
 
-	      private:
+		void * GrabPreviewFrame ();
+		void * GrabRecordFrame (int& index);
+		void ReleaseRecordFrame (int index);
+		void GrabRawFrame(void *previewBuffer, unsigned int width, unsigned int height);
+		camera_memory_t* GrabJpegFrame (camera_request_memory mRequestMemory,unsigned long& mfilesize,bool IsFrontCam);
+		camera_memory_t* CreateJpegFromBuffer(void *rawBuffer, camera_request_memory mRequestMemory);
+		unsigned long savePicture(unsigned char *inputBuffer, unsigned char *& output);
+		void convert(unsigned char *buf, unsigned char *rgb, int width, int height);
+
+	private:
 		struct vdIn *videoIn;
 		struct mdIn *mediaIn;
 		int camHandle;
-		int m_flag_init;
+		int m_flag_init;  
 		int mZoomLevel;
 		int mWhiteBalance;
 		int mFocusMode;
@@ -166,11 +158,9 @@ namespace android {
 		int nQueued;
 		int nDequeued;
 
-		unsigned long saveYUYVtoJPEG(unsigned char *inputBuffer,
-					     int width, int height,
-					     unsigned char *&outbuffer,
-					     int quality);
-		enum AE_AWB_LOCK_UNLOCK {
+		unsigned long saveYUYVtoJPEG (unsigned char *inputBuffer, int width, int height, unsigned char *& outbuffer, int quality);
+		enum AE_AWB_LOCK_UNLOCK
+		{
 			AE_UNLOCK_AWB_UNLOCK = 0,
 			AE_LOCK_AWB_UNLOCK,
 			AE_UNLOCK_AWB_LOCK,
@@ -178,6 +168,5 @@ namespace android {
 			AE_AWB_MAX
 		};
 	};
-
-};				// namespace android
+}; // namespace android
 #endif

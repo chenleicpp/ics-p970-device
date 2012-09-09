@@ -19,18 +19,12 @@
 #ifndef CONVERTER_H
 #define CONVERTER_H
 
-void yuv422_to_YV12(unsigned char *bufsrc, unsigned char *bufdest, int width,
-		    int height);
-void yuyv422_to_yuv420(unsigned char *bufsrc, unsigned char *bufdest, int width,
-		       int height);
-void yuyv422_to_yuv420sp(unsigned char *bufsrc, unsigned char *bufdest,
-			 int width, int height);
-void yuyv422_to_yuv422sp(unsigned char *bufsrc, unsigned char *bufdest,
-			 int width, int height);
+void yuv422_to_YV12(unsigned char *bufsrc, unsigned char *bufdest, int width, int height);
+void yuyv422_to_yuv420(unsigned char *bufsrc, unsigned char *bufdest, int width, int height);
+void yuyv422_to_yuv420sp(unsigned char *bufsrc, unsigned char *bufdest, int width, int height);
+void yuyv422_to_yuv422sp(unsigned char *bufsrc, unsigned char *bufdest, int width, int height);
 
-void convertYUYVtoRGB565(unsigned char *buf, unsigned char *rgb, int width,
-			 int height);
-static void yuv_to_rgb16(unsigned char y, unsigned char u, unsigned char v,
-			 unsigned char *rgb);
+void convertYUYVtoRGB565(unsigned char *buf, unsigned char *rgb, int width, int height);
+static void yuv_to_rgb16(unsigned char y, unsigned char u, unsigned char v, unsigned char *rgb);
 
 #endif

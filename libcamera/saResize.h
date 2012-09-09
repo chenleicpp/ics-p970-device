@@ -46,14 +46,21 @@
 int OMAPResizerOpen();
 void OMAPResizerClose(int handle);
 int OMAPResizerConvert(int handle, void *inData,
-		       int inHeight,
-		       int inWidth, void *outData, int outHeight, int outWidth);
+							int inHeight,
+							int inWidth,
+							void *outData,
+							int outHeight,
+							int outWidth);
 int OMAPResizerConvertDirect(int handle, void *in_start,
-			     int inHeight,
-			     int inWidth,
-			     void *out_start, int outHeight, int outWidth);
+							int inHeight,
+							int inWidth,
+							void *out_start,
+							int outHeight,
+							int outWidth);
 
 int OMAPResizerConvertV4l2(int handle, void *in_start,
-			   int inHeight,
-			   int inWidth,
-			   void *out_start, int outHeight, int outWidth);
+							int inHeight,
+							int inWidth,
+							void *out_start,
+							int outHeight,
+							int outWidth);

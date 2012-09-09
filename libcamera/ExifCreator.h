@@ -1,13 +1,10 @@
 #ifndef ANDROID_EXIFCREATOR_H
-
 #define ANDROID_EXIFCREATOR_H
 
 #include <utils/Errors.h>
-
 #include "Exif.h"
-
 namespace android {
-
+	
 //exif Type
 
 #define	TYPE_BYTE		1
@@ -62,11 +59,11 @@ namespace android {
 
 #define	EXPOSURE_TIME_ID		0x829A
 
-#define	FNUMBER_ID			0x829D
+#define	FNUMBER_ID			0x829D 
 
-#define EXPOSURE_PROGRAM_ID		0x8822
+#define EXPOSURE_PROGRAM_ID		0x8822		
 
-#define	ISO_SPEED_RATING_ID		0x8827
+#define	ISO_SPEED_RATING_ID		0x8827 
 
 #define EXIF_VERSION_ID			0x9000
 
@@ -74,21 +71,21 @@ namespace android {
 
 #define DATE_TIME_DIGITIZE_ID		0x9004
 
-#define	SHUTTER_SPEED_ID		0x9201
+#define	SHUTTER_SPEED_ID		0x9201 
 
-#define	APERTURE_VALUE_ID		0x9202
+#define	APERTURE_VALUE_ID		0x9202	
 
 #define	BRIGHTNESS_VALUE_ID		0x9203
 
 #define	EXPOSURE_BIAS_ID		0x9204
 
-#define	MAX_APERTURE_VALUE_ID		0x9205
+#define	MAX_APERTURE_VALUE_ID		0x9205	
 
-#define	METERING_MODE_ID		0x9207
+#define	METERING_MODE_ID		0x9207 
 
 #define FLASH_ID			0x9209
 
-#define FOCAL_LENGTH_ID			0x920A
+#define FOCAL_LENGTH_ID			0x920A 
 
 #define USER_COMMENT_ID			0x9286
 
@@ -130,171 +127,77 @@ namespace android {
 
 #define	OFFSET_SIZE			4
 
-#define	NUM_0TH_IFD			10	// -1 by GPS
+#define	NUM_0TH_IFD			10 // -1 by GPS
 
-#define	NUM_0TH_IFD_WO_GPS		11	// +1 by GPS
+#define	NUM_0TH_IFD_WO_GPS		11 // +1 by GPS
 
-#define  NUM_GPS_IDF       		10
+#define  NUM_GPS_IDF       		10 
 
-#define	NUM_EXIF_IFD			25	// 22 // 12 // 11 // 14 // 20
+#define	NUM_EXIF_IFD			25 // 22 // 12 // 11 // 14 // 20
 
-#define	NUM_1TH_IFD			10	// 7
+#define	NUM_1TH_IFD			10 // 7
 
-	class ExifCreator {
+class ExifCreator
+{
 
-	      public:
+public:
 
-		ExifCreator();
+	ExifCreator();
 
-		~ExifCreator();
+	~ExifCreator();
 
-		unsigned int
+    unsigned int ExifCreate(unsigned char* dest, ExifInfoStructure *pSetExifInfo);
 
-		 ExifCreate(unsigned char *dest,
-			    ExifInfoStructure * pSetExifInfo);
+    unsigned int ExifCreate_wo_GPS(unsigned char* dest, ExifInfoStructure *pSetExifInfo,int flag);
 
-		unsigned int
+    void * ExifMemcpy(void *dest, void *src, unsigned int count);
 
-		 ExifCreate_wo_GPS(unsigned char *dest,
-				   ExifInfoStructure * pSetExifInfo, int flag);
+    unsigned int __ExifCreate(unsigned char* pInput, ExifInfoStructure *pSetExifInfo);
 
-		void *ExifMemcpy(void *dest, void *src, unsigned int count);
+    unsigned int __ExifCreate_wo_GPS(unsigned char* pInput, ExifInfoStructure *pSetExifInfo,int flag);
 
-		unsigned int
+    void __ExifWriteGPSInfoTag(unsigned short tagID, Rational* pValue, unsigned int count, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		 __ExifCreate(unsigned char *pInput,
-			      ExifInfoStructure * pSetExifInfo);
+    void __ExifWriteRATIONALTag(unsigned short tagID, unsigned int numerator, unsigned int denominator, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		unsigned int
+    void __ExifWriteSRATIONALTag(unsigned short tagID, int numerator, int denominator, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		 __ExifCreate_wo_GPS(unsigned char *pInput,
-				     ExifInfoStructure * pSetExifInfo,
-				     int flag);
+    void __ExifWriteLONGTag(unsigned short tagID, unsigned int value, unsigned char* pInput, unsigned char* pCurBuff);
 
-		void
+    void __ExifWriteSHORTTag(unsigned short tagID, unsigned short value, unsigned char* pInput, unsigned char* pCurBuff );
 
-		 __ExifWriteGPSInfoTag(unsigned short tagID, Rational * pValue,
-				       unsigned int count,
-				       unsigned char *pInput,
-				       unsigned char *pCurBuff,
-				       unsigned int *pOffset);
+	void __ExifWriteBYTESTag(unsigned short tagID, unsigned char *pValue, unsigned int count, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		void
+    void __ExifWriteASCIITag(unsigned short tagID, unsigned char* pString, unsigned int count, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		 __ExifWriteRATIONALTag(unsigned short tagID,
-					unsigned int numerator,
-					unsigned int denominator,
-					unsigned char *pInput,
-					unsigned char *pCurBuff,
-					unsigned int *pOffset);
+    void __ExifWriteUNDEFINEDTag(unsigned short tagID, unsigned char* pValue, unsigned int count, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		void
+    void __ExifWriteIFDTag(unsigned short tagID, ExifInfoStructure *pSetExifInfo, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		 __ExifWriteSRATIONALTag(unsigned short tagID, int numerator,
-					 int denominator, unsigned char *pInput,
-					 unsigned char *pCurBuff,
-					 unsigned int *pOffset);
+    void __ExifWriteLONG_LE(unsigned char* pBuff, unsigned int value);
 
-		void
+    void __ExifWriteSLONG_LE(unsigned char* pBuff, int value);
 
-		 __ExifWriteLONGTag(unsigned short tagID, unsigned int value,
-				    unsigned char *pInput,
-				    unsigned char *pCurBuff);
+	void __ExifWriteSHORT_LE(unsigned char* pBuff, unsigned short value);
 
-		void
+	void __ExifWriteASCII(unsigned char* pBuff, unsigned char* pString, unsigned int count);
 
-		 __ExifWriteSHORTTag(unsigned short tagID, unsigned short value,
-				     unsigned char *pInput,
-				     unsigned char *pCurBuff);
+    void __ExifWriteUNDEFINED(unsigned char* pBuff, unsigned char* pValue, unsigned int count);
 
-		void
+    void __ExifWriteRATIONAL(unsigned char* pBuff, unsigned int numerator, unsigned int denominator);
 
-		 __ExifWriteBYTESTag(unsigned short tagID,
-				     unsigned char *pValue, unsigned int count,
-				     unsigned char *pInput,
-				     unsigned char *pCurBuff,
-				     unsigned int *pOffset);
+    void __ExifWriteSRATIONAL(unsigned char* pBuff, int numerator, int denominator);
 
-		void
+    void __ExifWriteExifIFD(ExifInfoStructure *pSetExifInfo, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		 __ExifWriteASCIITag(unsigned short tagID,
-				     unsigned char *pString, unsigned int count,
-				     unsigned char *pInput,
-				     unsigned char *pCurBuff,
-				     unsigned int *pOffset);
+    void __ExifWriteGPDIFD(ExifInfoStructure *pSetExifInfo, unsigned char* pInput, unsigned char* pCurBuff, unsigned int *pOffset);
 
-		void
+    unsigned int __ExifGetASCIILength(unsigned char* pString);
 
-		 __ExifWriteUNDEFINEDTag(unsigned short tagID,
-					 unsigned char *pValue,
-					 unsigned int count,
-					 unsigned char *pInput,
-					 unsigned char *pCurBuff,
-					 unsigned int *pOffset);
+};
 
-		void
-
-		 __ExifWriteIFDTag(unsigned short tagID,
-				   ExifInfoStructure * pSetExifInfo,
-				   unsigned char *pInput,
-				   unsigned char *pCurBuff,
-				   unsigned int *pOffset);
-
-		void
-
-		 __ExifWriteLONG_LE(unsigned char *pBuff, unsigned int value);
-
-		void
-
-		 __ExifWriteSLONG_LE(unsigned char *pBuff, int value);
-
-		void
-
-		 __ExifWriteSHORT_LE(unsigned char *pBuff,
-				     unsigned short value);
-
-		void
-
-		 __ExifWriteASCII(unsigned char *pBuff, unsigned char *pString,
-				  unsigned int count);
-
-		void
-
-		 __ExifWriteUNDEFINED(unsigned char *pBuff,
-				      unsigned char *pValue,
-				      unsigned int count);
-
-		void
-
-		 __ExifWriteRATIONAL(unsigned char *pBuff,
-				     unsigned int numerator,
-				     unsigned int denominator);
-
-		void
-
-		 __ExifWriteSRATIONAL(unsigned char *pBuff, int numerator,
-				      int denominator);
-
-		void
-
-		 __ExifWriteExifIFD(ExifInfoStructure * pSetExifInfo,
-				    unsigned char *pInput,
-				    unsigned char *pCurBuff,
-				    unsigned int *pOffset);
-
-		void
-
-		 __ExifWriteGPDIFD(ExifInfoStructure * pSetExifInfo,
-				   unsigned char *pInput,
-				   unsigned char *pCurBuff,
-				   unsigned int *pOffset);
-
-		unsigned int
-
-		 __ExifGetASCIILength(unsigned char *pString);
-
-	};
-
-};				// namespace android
+};// namespace android
 
 #endif
+
+
