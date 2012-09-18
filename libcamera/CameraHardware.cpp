@@ -72,7 +72,7 @@ namespace android {
 
 /* 29/12/10 : preview/picture size validation logic */
 const char CameraHardware::supportedPictureSizes_ffc [] = "640x480";
-const char CameraHardware::supportedPictureSizes_bfc [] = "640x480,800x480,1600x960,1600x1200,2048x1232,2048x1536,2560x1536,2560x1920";
+const char CameraHardware::supportedPictureSizes_bfc [] = "640x480";
 const char CameraHardware::supportedPreviewSizes_ffc [] = "640x480,320x240,176x144";
 const char CameraHardware::supportedPreviewSizes_bfc [] = "1280x720,800x480,720x480,640x480,352x288";
 
