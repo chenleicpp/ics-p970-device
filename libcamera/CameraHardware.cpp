@@ -175,8 +175,15 @@ void CameraHardware::initDefaultParameters(int CameraID) {
 		p.set("picture-size-values",
 			  CameraHardware::supportedPictureSizes_bfc);
 
-		p.set(CameraParameters::KEY_FOCUS_MODE,
-			  CameraParameters::FOCUS_MODE_FIXED);
+    	parameterString = CameraParameters::FOCUS_MODE_AUTO;
+        parameterString.append(",");
+        parameterString.append(CameraParameters::FOCUS_MODE_MACRO);
+		parameterString.append(",");
+		parameterString.append(FOCUS_MODE_FACEDETECTION);
+		p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
+              		parameterString.string());
+        p.set(CameraParameters::KEY_FOCUS_MODE,
+              			CameraParameters::FOCUS_MODE_AUTO);
 
 		p.set(CameraParameters::KEY_SUPPORTED_PICTURE_SIZES,
 			  CameraHardware::supportedPictureSizes_bfc);
