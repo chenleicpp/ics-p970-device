@@ -143,6 +143,7 @@ PRODUCT_COPY_FILES += \
 ## Touchscreen Calibration
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/idc/hub_synaptics_touch.idc:system/usr/idc/hub_synaptics_touch.idc
+
 PRODUCT_PACKAGES += \
     libskiahw \
     libmemalloc \
@@ -161,14 +162,35 @@ PRODUCT_PACKAGES += \
 
 # OMX components
 PRODUCT_PACKAGES += \
-    libstagefrighthw \
-    libdivxdrmdecrypt \
-    libOmxVdec \
-    libOmxVenc \
-    libOmxAacEnc \
-    libOmxAmrEnc \
-    libmm-omxcore \
-    libOmxCore
+	libstagefrighthw \
+    libbridge \
+    libOMX_Core \
+    libLCML \
+    libOMX.TI.Video.Decoder \
+    libOMX.TI.Video.encoder \
+    libOMX.TI.WBAMR.decode \
+    libOMX.TI.AAC.encode \
+    libOMX.TI.G722.decode \
+    libOMX.TI.MP3.decode \
+    libOMX.TI.WMA.decode \
+    libOMX.TI.Video.encoder \
+    libOMX.TI.WBAMR.encode \
+    libOMX.TI.G729.encode \
+    libOMX.TI.AAC.decode \
+    libOMX.TI.VPP \
+    libOMX.TI.G711.encode \
+    libOMX.TI.JPEG.encoder \
+    libOMX.TI.G711.decode \
+    libOMX.TI.ILBC.decode \
+    libOMX.TI.ILBC.encode \
+    libOMX.TI.AMR.encode \
+    libOMX.TI.G722.encode \
+    libOMX.TI.JPEG.decoder \
+    libOMX.TI.G726.encode \
+    libOMX.TI.G729.decode \
+    libOMX.TI.Video.Decoder \
+    libOMX.TI.AMR.decode \
+    libOMX.TI.G726.decode
     
 # HWComposer
 PRODUCT_PACKAGES += hwcomposer.default
@@ -178,8 +200,9 @@ PRODUCT_PACKAGES += camera.p970
 
 # OpenMAX IL configuration
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/policytable.tbl:system/etc/policytable.tbl \
-    $(LOCAL_PATH)/media_profiles.xml:system/etc/media_profiles.xml
+    $(LOCAL_PATH)/configs/policytable.tbl:system/etc/policytable.tbl \
+    $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml \
+    $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml
 
 PRODUCT_PACKAGES += \
     libomap_mm_library_jni
