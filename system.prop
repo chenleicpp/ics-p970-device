@@ -2,24 +2,19 @@
 # system.prop for p970
 #
 
-# Enable OMAP stuffs
+## Enable OMAP stuffs
 com.ti.omap_enhancement=true
 
 ro.sf.lcd_density=240
 
-#Sound config
-alsa.mixer.capture.master=Analog
-alsa.mixer.playback.master=DAC2 Analog
-
-# Radio stuffs
-ro.telephony.ril.v3=facilitylock,datacall,signalstrength,icccardstatus,singlepdp
+## Radio stuffs
 ro.telephony.call_ring.multiple=false
-ro.telephony.call_ring.delay=1000
+ro.telephony.call_ring.delay=3000
 ro.telephony.call_ring.absent=true
-ro.telephony.ril_class=LGEStarRIL
 rild.libpath=/system/lib/lge-ril.so
 rild.libargs=-d /dev/ttyspi0
-mobiledata.interfaces=vsnet0,vsnet1,vsnet2,vsnet3
+mobiledata.interfaces=vsnet0,vsnet1
+ro.telephony.ril_class=LGEInfineon
 
 ro.opengles.version=131072
 dalvik.vm.dexopt-data-only=1
@@ -38,7 +33,4 @@ dalvik.vm.heapsize=32m
 # Dummy LGE lightsensor
 ro.hardware.respect_als=true
 
-# Usb mass storage
-sys.usb.state=mass_storage,adb
-persist.sys.usb.config=mass_storage,adb
-
+persist.sys.usb.config=mtp,adb
