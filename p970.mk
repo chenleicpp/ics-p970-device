@@ -23,7 +23,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init.p970.rc:root/init.black.rc \
     $(LOCAL_PATH)/init.p970.usb.rc:root/init.black.usb.rc \
     $(LOCAL_PATH)/ueventd.p970.rc:root/ueventd.black.rc \
-    $(LOCAL_PATH)/configs/vold.fstab:system/etc/vold.fstab
+    $(LOCAL_PATH)/configs/vold.fstab:system/etc/vold.fstab \
+    $(LOCAL_PATH)/prebuilt/g-recovery:root/sbin/g-recovery
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/recovery/postrecoveryboot.sh:recovery/root/sbin/postrecoveryboot.sh
