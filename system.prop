@@ -33,4 +33,6 @@ dalvik.vm.heapsize=32m
 
 # Dummy LGE lightsensor
 ro.hardware.respect_als=true
-persist.sys.usb.config=mtp,adb
+# Usb mass storage
+sys.usb.state=mass_storage,adb
+persist.sys.usb.config=mass_storage,adb
