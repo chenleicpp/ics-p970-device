@@ -8,13 +8,14 @@ com.ti.omap_enhancement=true
 ro.sf.lcd_density=240
 
 ## Radio stuffs
+ro.telephony.ril.v3=facilitylock,datacall,signalstrength,icccardstatus,singlepdp
 ro.telephony.call_ring.multiple=false
-ro.telephony.call_ring.delay=3000
+ro.telephony.call_ring.delay=1000
 ro.telephony.call_ring.absent=true
+ro.telephony.ril_class=LGEStarRIL
 rild.libpath=/system/lib/lge-ril.so
 rild.libargs=-d /dev/ttyspi0
 mobiledata.interfaces=vsnet0,vsnet1
-ro.telephony.ril_class=LGEInfineon
 
 ro.opengles.version=131072
 dalvik.vm.dexopt-data-only=1
@@ -32,5 +33,4 @@ dalvik.vm.heapsize=32m
 
 # Dummy LGE lightsensor
 ro.hardware.respect_als=true
-
 persist.sys.usb.config=mtp,adb

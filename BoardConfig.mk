@@ -25,7 +25,7 @@ COMMON_GLOBAL_CFLAGS += -DOMAP_ENHANCEMENT -DTARGET_OMAP3 -DOMAP_ENHANCEMENT_CPC
 endif
 
 # Try to build the kernel
-TARGET_KERNEL_CONFIG := cyanogenmod_p970_defconfig
+#TARGET_KERNEL_CONFIG := cyanogenmod_p970_defconfig
 # Keep this as a fallback
 TARGET_PREBUILT_KERNEL := device/lge/p970/kernel
 
