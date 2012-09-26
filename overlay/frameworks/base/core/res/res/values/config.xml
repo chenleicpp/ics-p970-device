@@ -9,6 +9,8 @@
     
     <!-- The default iface on which to monitor data use -->
     <string name="config_datause_iface">vsnet0</string>
+
+    <bool name="config_animateScreenLights">false</bool>
     
 <!--	
     <string-array translatable="false" name="config_tether_bluetooth_regexs">
