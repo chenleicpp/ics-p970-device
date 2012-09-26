@@ -66,6 +66,9 @@ on fs
 on post-fs-data
     setprop vold.post_fs_data_done 1
 
+    mkdir /data/misc/wifi 0770 wifi wifi
+    chmod 0770 /data/misc/wifi
+    chmod 0660 /data/misc/wifi/wpa_supplicant.conf
     chmod 0777 /data/misc/wifi/config_mac
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
     mkdir /data/misc/dhcp 0777 dhcp dhcp
