@@ -1,5 +1,8 @@
 import init.black.usb.rc
 
+on boot-pause
+    exec sbin/chargerlogo
+
 on early-init
 
 # create mountpoints
@@ -603,8 +606,3 @@ service setcpversion /system/bin/lgcpversion
     class main
     oneshot
 
-service charger /charger
-    class charger
-    user root
-    group root
-    oneshot
