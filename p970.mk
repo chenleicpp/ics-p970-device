@@ -59,12 +59,12 @@ PRODUCT_COPY_FILES += \
 ## GPS
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/gps_brcm_conf.xml:system/etc/gps_brcm_conf.xml
+
 # spn_conf
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/spn-conf.xml:system/etc/spn-conf.xml
 
 ## Wifi
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifimac/wlan-precheck:system/bin/wlan-precheck \
     $(LOCAL_PATH)/prebuilt/wireless.ko:system/lib/modules/wireless.ko \
@@ -99,7 +99,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/chargemode/chargerimages/lockscreen_charge_ani_no_battery.rle:root/chargerimages/lockscreen_charge_ani_no_battery.rle \
     $(LOCAL_PATH)/chargemode/chargerimages/white_lg_logo.rle:root/chargerimages/white_lg_logo.rle \
     $(LOCAL_PATH)/chargemode/chargerlogo:root/sbin/chargerlogo
-
 
 PRODUCT_PACKAGES += \
     prb \
@@ -137,6 +136,9 @@ PRODUCT_PACKAGES += \
     libOMX.TI.Video.Decoder \
     libOMX.TI.AMR.decode \
     libOMX.TI.G726.decode
+
+# HWComposer
+PRODUCT_PACKAGES += hwcomposer.default
 
 PRODUCT_PACKAGES += \
     hwcomposer.omap3 \
