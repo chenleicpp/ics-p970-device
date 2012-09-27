@@ -103,12 +103,16 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/chargemode/chargerlogo:root/sbin/chargerlogo
 
 PRODUCT_PACKAGES += \
+    libskiahw \
+    libmemalloc \
+    liboverlay \
     prb \
     lgcpversion \
     wifimac
 
 # OMX components
 PRODUCT_PACKAGES += \
+	libstagefrighthw \
     libbridge \
     cexec.out \
     libOMX_Core \
