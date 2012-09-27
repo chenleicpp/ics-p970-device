@@ -20,9 +20,6 @@
 <!-- These resources are around just to allow their values to be customized
 for different hardware and product builds. -->
 <resources>
-    <!-- Allows setting video size before recording starts -->
-    <bool name="needsEarlyVideoSize">true</bool>
-    <!-- The camera removes the focus modes by default when touch-to-focus
-exists. Use this option to change that behavior -->
-    <bool name="wantsFocusModes">false</bool>
+    <!-- The camera HAL does its own preview state management during snaps -->
+    <bool name="previewStopsDuringSnapshot">true</bool>
 </resources>
